@@ -37,6 +37,15 @@ void print_process(std::vector<process> &process_entries){
         printf("(%d %d)%s", process_entries[i].arrival, process_entries[i].duration, i+1 == process_entries.size()?"]\n":", ");
 }
 
+void print_queue(std::queue<int> q){
+  while (!q.empty())
+  {
+    std::cout << q.front() << " ";
+    q.pop();
+  }
+  std::cout << std::endl;
+}
+
 std::vector<process> read_file(char *path){
     std::ifstream file(path);
     std::vector<process> process_entries;
@@ -130,7 +139,7 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     int remaining_time[process_queue.size()];
     bool entered[process_queue.size()] = {0};
     std::queue<int> q;
-    int t;
+    int t, done = 0;
 
     for(int i = 0; i < process_queue.size(); i++)
         remaining_time[i] = process_queue[i].duration;
@@ -144,7 +153,7 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     q.push(0);
     t = process_queue[0].arrival;
     entered[0] = true;
-    while (!q.empty()){
+    while (done != process_queue.size()){
         if(remaining_time[q.front()] == process_queue[q.front()].duration)
             process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival;
 
@@ -153,7 +162,12 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
         if(remaining_time[q.front()] > 0)
             q.push(q.front());
         else{
+            done++;
             t += remaining_time[q.front()];
+
+            if(done == process_queue.size())
+                t+= quantum;
+
             process_queue[q.front()].measures.t_ret = t - process_queue[q.front()].arrival;
             process_queue[q.front()].measures.t_wtn = t - process_queue[q.front()].arrival - process_queue[q.front()].duration;
 
@@ -169,13 +183,21 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
 
         t += quantum;
 
-        for(int i=1; i < process_queue.size(); i++)
+        for(int i=1; i < process_queue.size(); i++){
+            if(!entered[i] && q.empty())
+                t = process_queue[i].arrival;
             if(!entered[i] && process_queue[i].arrival <= t){
                 entered[i] = true;
                 q.push(i);
             }
+        }
+        
+        q.pop();
 
-        q.pop();        
+        printf("(t=%d) \{P%c\} [", t, q.front()+65);
+        for(int i = 0; i < process_queue.size(); i++)
+            printf("%d%s", remaining_time[i], i+1 == process_queue.size()?"] - ":", ");
+        print_queue(q);
     };
     
     return averages;
