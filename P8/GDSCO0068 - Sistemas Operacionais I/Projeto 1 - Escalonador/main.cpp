@@ -1,7 +1,8 @@
-#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <vector>
+#include <queue>
 #include <string>
 
 // ------======Estruturas======------
@@ -11,7 +12,7 @@ template <typename T> struct execution_measures {
     T t_ans; // Tempo de Resposta
     T t_wtn; // Tempo de Espera
 
-    execution_measures& operator +=(const execution_measures& other){
+    execution_measures& operator +=(const execution_measures &other){
         t_ret += other.t_ret;
         t_ans += other.t_ans;
         t_wtn += other.t_wtn;
@@ -57,19 +58,20 @@ std::vector<process> read_file(char *path){
     return process_entries;
 }
 
-void update_measures(std::vector<process> &process_queue, execution_measures<float> &means, int &t, int i){
+void update_measures(std::vector<process> &process_queue, execution_measures<float> &averages, int &t, int i){
     int t_ans = std::max(process_queue[i].arrival, t - process_queue[i].arrival);
     int t_ret = t + process_queue[i].duration - process_queue[i].arrival;
     int t_wtn = t - process_queue[i].arrival;
 
     process_queue[i].measures = {t_ret, t_ans, t_wtn};
-    std::cout << "(t=" << t << ") P"<< i << ": " << process_queue[i].arrival  << " " << process_queue[i].duration << "  " << process_queue[i].measures.t_ret << " " << process_queue[i].measures.t_ans << " " << process_queue[i].measures.t_wtn << "\n";
 
-    means += execution_measures<float>{
+    averages += execution_measures<float>{
         (float) t_ret/process_queue.size(),
         (float) t_ans/process_queue.size(),
         (float) t_wtn/process_queue.size()
     };
+
+    std::cout << "(t=" << t << ") P"<< i << ": " << process_queue[i].arrival  << " " << process_queue[i].duration << "  " << process_queue[i].measures.t_ret << " " << process_queue[i].measures.t_ans << " " << process_queue[i].measures.t_wtn << "\n";
 
     t += process_queue[i].duration;
 }
@@ -126,11 +128,11 @@ execution_measures<float> SJF(std::vector<process> process_queue){
 execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     execution_measures<float> averages = {0.0, 0.0, 0.0};
     int remaining_time[process_queue.size()];
-    bool finished = false;
-    int i;
+    bool entered[process_queue.size()] = {0};
+    std::queue<int> q;
     int t;
 
-    for(i = 0; i < process_queue.size(); i++)
+    for(int i = 0; i < process_queue.size(); i++)
         remaining_time[i] = process_queue[i].duration;
 
     std::sort(process_queue.begin(), process_queue.end(), 
@@ -139,32 +141,42 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
         }
     );
 
+    q.push(0);
     t = process_queue[0].arrival;
-    while(!finished){
-        finished = true;
-        i = 0;
+    entered[0] = true;
+    while (!q.empty()){
+        if(remaining_time[q.front()] == process_queue[q.front()].duration)
+            process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival;
 
-        for(int i=0; i < process_queue.size(); i++){
-            if(remaining_time[i] == 0 || process_queue[i].arrival > t)
-                continue;
+        remaining_time[q.front()] -= quantum;
 
-            remaining_time[i] -= quantum;
+        if(remaining_time[q.front()] > 0)
+            q.push(q.front());
+        else{
+            t += remaining_time[q.front()];
+            process_queue[q.front()].measures.t_ret = t - process_queue[q.front()].arrival;
+            process_queue[q.front()].measures.t_wtn = t - process_queue[q.front()].arrival - process_queue[q.front()].duration;
 
-            if(remaining_time[i] <= 0){
-                t += quantum + remaining_time[i];
-                remaining_time[i] = 0;
-                update_measures(process_queue, averages, t, i);
-            } else{
-                finished = false;
-                t += quantum;
+            std::cout << "(t=" << t << ") P"<< q.front() << ": " << process_queue[q.front()].arrival  << " " << process_queue[q.front()].duration << "  " << process_queue[q.front()].measures.t_ret << " " << process_queue[q.front()].measures.t_ans << " " << process_queue[q.front()].measures.t_wtn << "\n";
+
+            averages += execution_measures<float>{
+                (float) process_queue[q.front()].measures.t_ret/process_queue.size(),
+                (float) process_queue[q.front()].measures.t_ans/process_queue.size(),
+                (float) process_queue[q.front()].measures.t_wtn/process_queue.size()
+            };
+
+        }
+
+        t += quantum;
+
+        for(int i=1; i < process_queue.size(); i++)
+            if(!entered[i] && process_queue[i].arrival <= t){
+                entered[i] = true;
+                q.push(i);
             }
 
-            printf("(t=%d) [", t);
-            for(int i = 0; i < process_queue.size(); i++)
-                printf("%d%s", remaining_time[i], i+1 == process_queue.size()?"]\n":", ");
-        }
-        i++;
-    }
+        q.pop();        
+    };
     
     return averages;
 }
