@@ -71,6 +71,9 @@ void update_measures(std::vector<process> &process_queue, execution_measures<flo
     int t_ret = t + process_queue[i].duration - process_queue[i].arrival;
     int t_ans = t - process_queue[i].arrival;
 
+    if(t_ans < 0)
+        t_ans = 0;
+
     process_queue[i].measures = {t_ret, t_ans, t_ans};
     averages += execution_measures<float>{
         (float) t_ret/process_queue.size(),
@@ -79,7 +82,6 @@ void update_measures(std::vector<process> &process_queue, execution_measures<flo
     };
     t += process_queue[i].duration;
 }
-
 
 
 //------======Métodos======------
@@ -149,9 +151,8 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     t = process_queue[0].arrival;
     entered[0] = true;
     while (done != process_queue.size()){
-        if(remaining_time[q.front()] == process_queue[q.front()].duration)
-            if(q.front() != 0)
-                process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival - quantum;
+        if(remaining_time[q.front()] == process_queue[q.front()].duration && t != process_queue[q.front()].arrival)
+            process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival - quantum;
 
         remaining_time[q.front()] -= quantum;
 
@@ -159,9 +160,9 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
             q.push(q.front());
         else{
             done++;
-            t += remaining_time[q.front()];
+            t += remaining_time[q.front()];    // Correção do quantum, caso ele fique negativo
 
-            if(done == process_queue.size())
+            if(done == process_queue.size())    // Levando o tempo até o final do processo, quando o mesmo for o último
                 t += quantum;
 
             process_queue[q.front()].measures.t_ret = t - process_queue[q.front()].arrival;
@@ -176,6 +177,8 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
         }
 
         t += quantum;
+        q.pop();
+
 
         for(int i=1; i < process_queue.size(); i++){
             if(!entered[i] && q.empty())
@@ -186,7 +189,6 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
             }
         }
         
-        q.pop();
     };
     
     return averages;
