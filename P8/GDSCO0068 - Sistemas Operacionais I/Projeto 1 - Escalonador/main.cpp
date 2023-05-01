@@ -68,20 +68,15 @@ std::vector<process> read_file(char *path){
 }
 
 void update_measures(std::vector<process> &process_queue, execution_measures<float> &averages, int &t, int i){
-    int t_ans = std::max(process_queue[i].arrival, t - process_queue[i].arrival);
     int t_ret = t + process_queue[i].duration - process_queue[i].arrival;
-    int t_wtn = t - process_queue[i].arrival;
+    int t_ans = t - process_queue[i].arrival;
 
-    process_queue[i].measures = {t_ret, t_ans, t_wtn};
-
+    process_queue[i].measures = {t_ret, t_ans, t_ans};
     averages += execution_measures<float>{
         (float) t_ret/process_queue.size(),
         (float) t_ans/process_queue.size(),
-        (float) t_wtn/process_queue.size()
+        (float) t_ans/process_queue.size()
     };
-
-    std::cout << "(t=" << t << ") P"<< i << ": " << process_queue[i].arrival  << " " << process_queue[i].duration << "  " << process_queue[i].measures.t_ret << " " << process_queue[i].measures.t_ans << " " << process_queue[i].measures.t_wtn << "\n";
-
     t += process_queue[i].duration;
 }
 
@@ -101,6 +96,8 @@ execution_measures<float> FCFS(std::vector<process> process_queue){
 
     t = process_queue[0].arrival;
     for(int i=0; i < process_queue.size(); i++){
+        if(process_queue[i].arrival > t)
+            t = process_queue[i].arrival;
         update_measures(process_queue, averages, t, i);
     }
 
@@ -127,10 +124,8 @@ execution_measures<float> SJF(std::vector<process> process_queue){
         if(i+1 != process_queue.size())
             std::swap(process_queue[i], process_queue[current]);
         update_measures(process_queue, averages, t, i);
-        print_process(process_queue);
     }
 
-    // std::cout << "(t=" << t << ")\n";
     return averages;
 }
 
@@ -154,11 +149,9 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     t = process_queue[0].arrival;
     entered[0] = true;
     while (done != process_queue.size()){
-        if(remaining_time[q.front()] == process_queue[q.front()].duration){
-            process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival;
+        if(remaining_time[q.front()] == process_queue[q.front()].duration)
             if(q.front() != 0)
-                process_queue[q.front()].measures.t_ans -= quantum;
-        }
+                process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival - quantum;
 
         remaining_time[q.front()] -= quantum;
 
@@ -173,8 +166,6 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
 
             process_queue[q.front()].measures.t_ret = t - process_queue[q.front()].arrival;
             process_queue[q.front()].measures.t_wtn = t - process_queue[q.front()].arrival - process_queue[q.front()].duration;
-
-            std::cout << "(t=" << t << ") P"<< q.front() << ": " << process_queue[q.front()].arrival  << " " << process_queue[q.front()].duration << "  " << process_queue[q.front()].measures.t_ret << " " << process_queue[q.front()].measures.t_ans << " " << process_queue[q.front()].measures.t_wtn << "\n";
 
             averages += execution_measures<float>{
                 (float) process_queue[q.front()].measures.t_ret/process_queue.size(),
@@ -196,11 +187,6 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
         }
         
         q.pop();
-
-        printf("(t=%d) \{P%c\} [", t, q.front()+65);
-        for(int i = 0; i < process_queue.size(); i++)
-            printf("%d%s", remaining_time[i], i+1 == process_queue.size()?"] - ":", ");
-        print_queue(q);
     };
     
     return averages;
@@ -212,13 +198,13 @@ int main(int argc, char *argv[]){
     std::vector<process> process_entries = read_file(argv[1]);
     execution_measures result = FCFS(process_entries);
 
-    printf("FCFS: %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
+    printf("FCFS %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
 
     result = SJF(process_entries);
-    printf("SJF: %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
+    printf("SJF %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
 
     result = RR(process_entries, 2);
-    printf("RR: %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
+    printf("RR %.1f %.1f %.1f\n", result.t_ret, result.t_ans, result.t_wtn);
 
     return 0;
 }
