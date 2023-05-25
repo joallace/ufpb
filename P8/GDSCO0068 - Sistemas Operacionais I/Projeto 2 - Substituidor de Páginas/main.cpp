@@ -29,12 +29,13 @@ memory_instace read_file(char *path){
     return instance;
 }
 
-void FIFO(memory_instace &instance, std::deque<int> &frames, int i, std::vector<int> &entry_order){
+void FIFO(memory_instace &instance, std::deque<int> &frames, int i){
     frames.pop_front();
     frames.push_back(instance.page_references[i]);
 }
 
-void optimal(memory_instace &instance, std::deque<int> &frames, int i, std::vector<int> &entry_order){
+void optimal(memory_instace &instance, std::deque<int> &frames, int i){
+    std::vector<int> entry_order;
     bool inside;
 
     entry_order.clear();
@@ -57,7 +58,8 @@ void optimal(memory_instace &instance, std::deque<int> &frames, int i, std::vect
 }
 
 
-void LRU(memory_instace &instance, std::deque<int> &frames, int i, std::vector<int> &entry_order){
+void LRU(memory_instace &instance, std::deque<int> &frames, int i){
+    std::vector<int> entry_order;
     bool inside;
 
     entry_order.clear();
@@ -79,9 +81,8 @@ void LRU(memory_instace &instance, std::deque<int> &frames, int i, std::vector<i
         }
 }
 
-int getNumberOfFaults(memory_instace& instance, void (*algorithm)(memory_instace&, std::deque<int>&, int, std::vector<int>&)){
+int getNumberOfFaults(memory_instace& instance, void (*algorithm)(memory_instace&, std::deque<int>&, int)){
     std::deque<int> frames(instance.frames);
-    std::vector<int> entry_order;
     int faults = instance.frames;
     bool inside;
 
@@ -98,7 +99,7 @@ int getNumberOfFaults(memory_instace& instance, void (*algorithm)(memory_instace
 
         if(!inside){
             faults++;
-            algorithm(instance, frames, i, entry_order);
+            algorithm(instance, frames, i);
         }
     }
 
