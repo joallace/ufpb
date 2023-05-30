@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <queue>
+#include <limits>
 
 struct memory_instace{
     std::vector<int> page_references;
@@ -18,8 +19,7 @@ memory_instace read_file(char *path){
 
     file >> instance.frames;
 
-    while (true)
-    {
+    while (true){
         file >> aux;
         if (file.eof())
             break;
@@ -29,77 +29,80 @@ memory_instace read_file(char *path){
     return instance;
 }
 
-void FIFO(memory_instace &instance, std::deque<int> &frames, int i){
+template<typename Container>
+void print_container(Container const &arr){
+    printf("[");
+    for (int i = 0; i < arr.size(); i++)
+        printf("%d%s", arr[i], i + 1 == arr.size() ? "]\n" : ", ");
+}
+
+template<typename Container>
+int getIndex(const Container& container, int element, int startIndex = 0, bool reverse = false){
+    if(startIndex < 0 || startIndex >= container.size())
+        return -1;
+  
+    for(int i=startIndex; reverse? (i>=0) : (i<container.size()); reverse? i-- : i++)
+        if(container[i] == element)
+            return i;
+  
+    return -1;
+}
+
+void FIFO(memory_instace &instance, std::deque<int> &frames, int next_idx){
     frames.pop_front();
-    frames.push_back(instance.page_references[i]);
+    frames.push_back(instance.page_references[next_idx]);
 }
 
-void optimal(memory_instace &instance, std::deque<int> &frames, int i){
-    std::vector<int> entry_order;
-    bool inside;
+void optimal(memory_instace &instance, std::deque<int> &frames, int next_idx){
+    int max_idx = -1;
+    int current_idx;
+    int replace_idx;
 
-    entry_order.clear();
-    for(int j=i; (entry_order.size()<frames.size()) || (j<instance.page_references.size()); j++){
-        inside=false;
-        for(int k=0; k<entry_order.size(); k++)
-            if(instance.page_references[j] == entry_order[k]){
-                    inside=true;
-                    break;
-                }
-        if(!inside)
-            entry_order.push_back(instance.page_references[j]);
-    }
+    for(int i=0; i<frames.size(); i++){
+        current_idx = getIndex(instance.page_references, frames[i], next_idx);
 
-    for(int j=0; j<frames.size(); j++)
-        if(frames[j] == entry_order.back()){
-            frames[j] = instance.page_references[i];
+        if(current_idx == -1){
+            frames[i] = instance.page_references[next_idx];
             return;
         }
-}
 
-
-void LRU(memory_instace &instance, std::deque<int> &frames, int i){
-    std::vector<int> entry_order;
-    bool inside;
-
-    entry_order.clear();
-    for(int j=i; (entry_order.size()<frames.size()) || (j>=0); j--){
-        inside=false;
-        for(int k=0; k<entry_order.size(); k++)
-            if(instance.page_references[j] == entry_order[k]){
-                inside=true;
-                break;
-            }
-        if(!inside)
-            entry_order.push_back(instance.page_references[j]);
+        if(current_idx > max_idx){
+            replace_idx = i;
+            max_idx = current_idx;
+        }
     }
 
-    for(int j=0; j<frames.size(); j++)
-        if(frames[j] == entry_order.back()){
-            frames[j] = instance.page_references[i];
-            return;
-        }
+    frames[replace_idx] = instance.page_references[next_idx];
 }
 
-int getNumberOfFaults(memory_instace& instance, void (*algorithm)(memory_instace&, std::deque<int>&, int)){
-    std::deque<int> frames(instance.frames);
-    int faults = instance.frames;
-    bool inside;
+void LRU(memory_instace &instance, std::deque<int> &frames, int next_idx){
+    int min_idx = std::numeric_limits<int>::max();
+    int current_idx;
+    int replace_idx;
 
-    for(int i=0; i<frames.size(); i++)
-        frames[i] = instance.page_references[i];
+    for(int i=0; i<frames.size(); i++){
+        current_idx = getIndex(instance.page_references, frames[i], next_idx, true);
+        
+        if(current_idx < min_idx){
+            replace_idx = i;
+            min_idx = current_idx;
+        }
+    }
 
-    for(int i=instance.frames; i<instance.page_references.size(); i++){
-        inside = false;
-        for(int j=0; j<instance.frames; j++)
-            if(instance.page_references[i] == frames[j]){
-                inside = true;
-                break;
-            }
+    frames[replace_idx] = instance.page_references[next_idx];
+}
 
-        if(!inside){
+int getNumberOfFaults(memory_instace& instance, void (*replacement_algorithm)(memory_instace&, std::deque<int>&, int)){
+    std::deque<int> frames;
+    int faults = 0;
+
+    for(int i=0; i<instance.page_references.size(); i++){
+        if(getIndex(frames, instance.page_references[i]) == -1){
             faults++;
-            algorithm(instance, frames, i);
+            if(frames.size() == instance.frames)
+                replacement_algorithm(instance, frames, i);
+            else
+                frames.push_back(instance.page_references[i]);
         }
     }
 
