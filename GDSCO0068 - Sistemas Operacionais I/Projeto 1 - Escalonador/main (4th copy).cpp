@@ -80,6 +80,7 @@ void update_measures(std::vector<process> &process_queue, execution_measures<flo
         (float) t_ans/process_queue.size(),
         (float) t_ans/process_queue.size()
     };
+    std::cout << "(t=" << t << ") P"<< i << ": " << process_queue[i].arrival  << " " << process_queue[i].duration << "  " << process_queue[i].measures.t_ret << " " << process_queue[i].measures.t_ans << " " << process_queue[i].measures.t_wtn << "\n";
 
     t += process_queue[i].duration;
 }
@@ -127,7 +128,7 @@ execution_measures<float> SJF(std::vector<process> process_queue){
 
         if(t<process_queue[current].arrival)
             t = process_queue[current].arrival;
-            
+
         if(i+1 != process_queue.size())
             std::swap(process_queue[i], process_queue[current]);
         update_measures(process_queue, averages, t, i);
@@ -153,13 +154,32 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
     );
 
     t = process_queue[0].arrival;
-    q.push(0);
-    entered[0] = true;
+    // q.push(0);
+
+    for(int i=0; i < process_queue.size(); i++){
+        if(process_queue[i].arrival == t){
+            q.push(i);
+            entered[i] = true;
+        } else
+            break;
+    }
+    
+    printf("(t=%d) \{P%c\} [", t, q.front()+65);
+        for(int i = 0; i < process_queue.size(); i++)
+            printf("%d%s", remaining_time[i], i+1 == process_queue.size()?"] - ":", ");
+        print_queue(q);
     while (done != process_queue.size()){
         if(remaining_time[q.front()] == process_queue[q.front()].duration && t != process_queue[q.front()].arrival)
             process_queue[q.front()].measures.t_ans = t - process_queue[q.front()].arrival - quantum;
 
         remaining_time[q.front()] -= quantum;
+
+        for(int i=1; i < process_queue.size(); i++){
+            if(!entered[i] && process_queue[i].arrival <= t){
+                entered[i] = true;
+                q.push(i);
+            }
+        }
 
         if(remaining_time[q.front()] > 0)
             q.push(q.front());
@@ -167,7 +187,7 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
             done++;
             t += remaining_time[q.front()];    // Correção do quantum, caso ele fique negativo
 
-            if(done == process_queue.size())    // Levando o tempo até o final do processo, quando o mesmo for o último
+            if(done != 1)    // Levando o tempo até o final do processo, quando o mesmo for o último
                 t += quantum;
 
             process_queue[q.front()].measures.t_ret = t - process_queue[q.front()].arrival;
@@ -179,6 +199,7 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
                 (float) process_queue[q.front()].measures.t_wtn/process_queue.size()
             };
 
+            std::cout << "(t=" << t << ") P"<< q.front() << ": " << process_queue[q.front()].arrival  << " " << process_queue[q.front()].duration << "  " << process_queue[q.front()].measures.t_ret << " " << process_queue[q.front()].measures.t_ans << " " << process_queue[q.front()].measures.t_wtn << "\n";
         }
 
         t += quantum;
@@ -186,14 +207,14 @@ execution_measures<float> RR(std::vector<process> process_queue, int quantum){
 
 
         for(int i=1; i < process_queue.size(); i++){
-            if(!entered[i] && q.empty())
+            if(q.empty() && !entered[i])
                 t = process_queue[i].arrival + quantum;
-            if(!entered[i] && process_queue[i].arrival <= t){
-                entered[i] = true;
-                q.push(i);
-            }
         }
 
+        printf("(t=%d) \{P%c\} [", t, q.front()+65);
+        for(int i = 0; i < process_queue.size(); i++)
+            printf("%d%s", remaining_time[i], i+1 == process_queue.size()?"] - ":", ");
+        print_queue(q);
     };
     
     return averages;
