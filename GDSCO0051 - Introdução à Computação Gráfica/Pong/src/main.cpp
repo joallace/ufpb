@@ -10,6 +10,7 @@ Audio *audioPlayer = new Audio();
 Player *player1 = new Player({50, WINDOW_HEIGHT/2});
 Player *player2 = new Player({WINDOW_WIDTH - 50, WINDOW_HEIGHT/2});
 Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer);
+bool isPaused = false;
 
 void initializeGlut(int argc, char *argv[]){
     glutInit(&argc, argv);
@@ -38,9 +39,11 @@ void display() {
 }
 
 void update(int value) {
-    ball->moveAndCollide(player1->position, player2->position, player1->getSize());
-    player1->move();
-    player2->move();
+    if(!isPaused){
+        ball->moveAndCollide(player1->position, player2->position, player1->getSize());
+        player1->move();
+        player2->move();
+    }
 
     glutPostRedisplay();
     glutTimerFunc(16, update, 0);
@@ -55,6 +58,9 @@ void handleKeyboard(unsigned char key, int x, int y) {
         case 'S':
         case 's':
             player1->controls.down = true;
+            break;
+        case 27:
+            isPaused = !isPaused;
             break;
     }
 }

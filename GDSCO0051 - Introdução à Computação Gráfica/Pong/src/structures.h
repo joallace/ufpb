@@ -7,6 +7,11 @@
 struct Vertex{
     int x;
     int y;
+
+    void operator ++(){
+        x>0 ? x++ : x--;
+        y>0 ? y++ : y--;
+    }
 };
 
 struct PlayerControls{

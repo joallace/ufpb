@@ -11,6 +11,7 @@ class Ball{
         int samples;
         int radius;
         Vertex defaultPosition;
+        Vertex defaultSpeed;
         Audio *audioPlayer;
 
         void collide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize);

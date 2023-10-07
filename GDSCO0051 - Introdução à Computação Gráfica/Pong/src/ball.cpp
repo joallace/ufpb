@@ -6,6 +6,7 @@ Ball::Ball(Vertex initialPosition, Audio *audioPlayerPtr){
     speed = {5, 5};
     position = initialPosition;
     defaultPosition = initialPosition;
+    defaultSpeed = speed;
     audioPlayer = audioPlayerPtr;
 }
 
@@ -22,10 +23,12 @@ void Ball::collide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize){
     if(position.x-radius < player1Pos.x+playerSize.x/2 && position.y > player1Pos.y-playerSize.y/2 && position.y < player1Pos.y+playerSize.y/2){
         audioPlayer->hit();
         speed.x *= -1;
+        ++speed;
     }
     if(position.x+radius > player2Pos.x-playerSize.x/2 && position.y > player2Pos.y-playerSize.y/2 && position.y < player2Pos.y+playerSize.y/2){
         audioPlayer->hit();
         speed.x *= -1;
+        ++speed;
     }
 }
 
@@ -52,4 +55,5 @@ void Ball::draw(){
 
 void Ball::reset(){
     position = defaultPosition;
+    speed = defaultSpeed;
 }
