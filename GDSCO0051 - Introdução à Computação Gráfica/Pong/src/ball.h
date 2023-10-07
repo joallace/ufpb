@@ -7,14 +7,16 @@ class Ball{
         int samples;
         int radius;
         Vertex defaultPosition;
-        
-        void collide(Vertex player1Pos, Vertex player2Pos);
+
+        void collide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize);
+
+
     public:
         Ball(Vertex initialPosition);
         Vertex speed;
         Vertex position;
 
-        void move(Vertex player1Pos, Vertex player2Pos);
+        void moveAndCollide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize);
         void draw();
         void reset();
 };

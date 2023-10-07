@@ -36,7 +36,7 @@ void display() {
 }
 
 void update(int value) {
-    ball->move(player1->position, player2->position);
+    ball->moveAndCollide(player1->position, player2->position, player1->getSize());
     player1->move();
     player2->move();
 

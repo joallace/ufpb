@@ -8,22 +8,30 @@ Ball::Ball(Vertex initialPosition){
     defaultPosition = initialPosition;
 }
 
-void Ball::collide(Vertex player1Pos, Vertex player2Pos){
+void Ball::collide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize){
     if(position.x - radius < 0 || position.x + radius> WINDOW_WIDTH)
-        speed.x *= -1;
+        reset();
     if(position.y - radius < 0 || position.y + radius > WINDOW_HEIGHT)
         speed.y *= -1;
+
+    if(position.x-radius < player1Pos.x+playerSize.x/2 && position.y > player1Pos.y-playerSize.y/2 && position.y < player1Pos.y+playerSize.y/2){
+        speed.x *= -1;
+        return;
+    }
+    if(position.x+radius > player2Pos.x-playerSize.x/2 && position.y > player2Pos.y-playerSize.y/2 && position.y < player2Pos.y+playerSize.y/2)
+        speed.x *= -1;
 }
 
 
-void Ball::move(Vertex player1Pos, Vertex player2Pos){
-    collide(player1Pos, player2Pos);
+void Ball::moveAndCollide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize){
+    collide(player1Pos, player2Pos, playerSize);
+    
     position.x += speed.x;
     position.y += speed.y;
 }
 
 void Ball::draw(){
-    glBegin(GL_POLYGON);
+    glBegin(GL_TRIANGLE_FAN);
         for(int i = 0; i < samples; i++){
             float theta = 2.0f * M_PIf * float(i) / samples;
 

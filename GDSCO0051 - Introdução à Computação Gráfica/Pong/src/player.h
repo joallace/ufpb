@@ -1,17 +1,12 @@
 #include <GL/glut.h>
 #include "structures.h"
 
-struct PlayerControls{
-    bool up;
-    bool down;
-};
-
 class Player{
     private:
-        int width;
-        int height;
-        int speed;
+        Vertex size;
         Vertex defaultPosition;
+        int speed;
+
     public:
         Player(Vertex initialPosition);
 
@@ -21,4 +16,5 @@ class Player{
         void move();
         void draw();
         void reset();
+        Vertex getSize();
 };

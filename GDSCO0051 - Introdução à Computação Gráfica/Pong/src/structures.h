@@ -9,4 +9,9 @@ struct Vertex{
     int y;
 };
 
+struct PlayerControls{
+    bool up;
+    bool down;
+};
+
 #endif
