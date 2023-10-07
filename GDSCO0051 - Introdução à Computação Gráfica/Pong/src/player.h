@@ -1,3 +1,6 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+
 #include <GL/glut.h>
 #include "structures.h"
 
@@ -18,3 +21,5 @@ class Player{
         void reset();
         Vertex getSize();
 };
+
+#endif

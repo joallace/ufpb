@@ -2,12 +2,14 @@
 #include <math.h>
 
 #include "structures.h"
+#include "audio.h"
 #include "player.h"
 #include "ball.h"
 
+Audio *audioPlayer = new Audio();
 Player *player1 = new Player({50, WINDOW_HEIGHT/2});
 Player *player2 = new Player({WINDOW_WIDTH - 50, WINDOW_HEIGHT/2});
-Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2});
+Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer);
 
 void initializeGlut(int argc, char *argv[]){
     glutInit(&argc, argv);

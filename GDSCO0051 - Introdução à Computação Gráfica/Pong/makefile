@@ -9,7 +9,7 @@ OBJECTS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 CXX = g++
 BITS_OPTION = -m64
 CXXFLAGS = -std=c++11 -O3 -fPIC -fexceptions
-LDLIBS = -lm -lGL -lGLU -lglut
+LDLIBS = -ldl -lpthread -lm -lGL -lGLU -lglut
 
 $(EXECUTABLE): $(OBJECTS) 
 	@echo  "\033[31m \nLinking all objects files: \033[0m"

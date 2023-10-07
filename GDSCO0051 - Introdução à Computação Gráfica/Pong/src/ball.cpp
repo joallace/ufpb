@@ -1,25 +1,32 @@
 #include "ball.h"
 
-Ball::Ball(Vertex initialPosition){
+Ball::Ball(Vertex initialPosition, Audio *audioPlayerPtr){
     samples = 16;
     radius = 16;
     speed = {5, 5};
     position = initialPosition;
     defaultPosition = initialPosition;
+    audioPlayer = audioPlayerPtr;
 }
 
 void Ball::collide(Vertex player1Pos, Vertex player2Pos, Vertex playerSize){
-    if(position.x - radius < 0 || position.x + radius> WINDOW_WIDTH)
+    if(position.x - radius < 0 || position.x + radius> WINDOW_WIDTH){
+        audioPlayer->goal();
         reset();
-    if(position.y - radius < 0 || position.y + radius > WINDOW_HEIGHT)
+    }
+    if(position.y - radius < 0 || position.y + radius > WINDOW_HEIGHT){
+        audioPlayer->wallHit();
         speed.y *= -1;
+    }
 
     if(position.x-radius < player1Pos.x+playerSize.x/2 && position.y > player1Pos.y-playerSize.y/2 && position.y < player1Pos.y+playerSize.y/2){
+        audioPlayer->hit();
         speed.x *= -1;
-        return;
     }
-    if(position.x+radius > player2Pos.x-playerSize.x/2 && position.y > player2Pos.y-playerSize.y/2 && position.y < player2Pos.y+playerSize.y/2)
+    if(position.x+radius > player2Pos.x-playerSize.x/2 && position.y > player2Pos.y-playerSize.y/2 && position.y < player2Pos.y+playerSize.y/2){
+        audioPlayer->hit();
         speed.x *= -1;
+    }
 }
 
 
