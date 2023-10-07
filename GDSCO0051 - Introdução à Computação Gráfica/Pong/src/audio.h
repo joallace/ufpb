@@ -7,7 +7,8 @@
 
 class Audio{
     private:
-        char* files[4] = {"assets/goal.wav", "assets/hit.wav", "assets/menu.wav", "assets/wallHit.wav"};
+        char* files[5] = {"assets/music.mp3", "assets/goal.wav", "assets/hit.wav", "assets/menu.wav", "assets/wallHit.wav"};
+        ma_sound sounds[5];
         ma_engine engine;
         ma_result result;
 

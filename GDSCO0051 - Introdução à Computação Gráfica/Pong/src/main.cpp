@@ -1,5 +1,6 @@
 #include <GL/glut.h>
 #include <math.h>
+#include <ctime>
 
 #include "structures.h"
 #include "audio.h"
@@ -26,11 +27,45 @@ void initializeOpenGL(){
     glMatrixMode(GL_MODELVIEW);
     gluOrtho2D(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     glColor3f(1.0f, 1.0f, 1.0f);
+
+    // Configuração da linha do meio
+    glPushAttrib(GL_ENABLE_BIT); 
+    glLineWidth(4.0f);
+    glLineStipple(14, 0xaaaa);
+    glEnable(GL_LINE_STIPPLE);
+
+}
+
+void drawDashedLine(){
+    glBegin(GL_LINES);
+        glVertex2i(WINDOW_WIDTH/2 + 4, 0);
+        glVertex2i(WINDOW_WIDTH/2 + 4, WINDOW_HEIGHT);
+    glEnd();
+}
+
+void drawScores(){
+    char score[3];
+    
+    // Player 1 Score
+    glRasterPos2i(WINDOW_WIDTH/2 - 50, 100);
+    sprintf(score, "%d", player1->score);
+    for(int i=0; i<3; i++){
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score[i]);
+    }
+
+    // Player 2 Score
+    glRasterPos2i(WINDOW_WIDTH/2 + 50, 100);
+    sprintf(score, "%d", player2->score);
+    for(int i=0; i<3; i++){
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score[i]);
+    }
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
+    drawDashedLine();
+    drawScores();
     player1->draw();
     player2->draw();
     ball->draw();
@@ -40,7 +75,7 @@ void display() {
 
 void update(int value) {
     if(!isPaused){
-        ball->moveAndCollide(player1->position, player2->position, player1->getSize());
+        ball->moveAndCollide(player1, player2);
         player1->move();
         player2->move();
     }
@@ -103,6 +138,7 @@ void handleArrowKeysUp(int key, int x, int y){
 int main(int argc, char** argv) {
     initializeGlut(argc, argv);
     initializeOpenGL();
+    srand(time(nullptr));
 
     glutDisplayFunc(display);
 

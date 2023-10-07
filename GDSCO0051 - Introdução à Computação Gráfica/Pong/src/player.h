@@ -13,12 +13,14 @@ class Player{
     public:
         Player(Vertex initialPosition);
 
+        int score;
         PlayerControls controls;
         Vertex position;
 
         void move();
         void draw();
         void reset();
+        bool collide(Vertex ballPos, int ballRadius);
         Vertex getSize();
 };
 

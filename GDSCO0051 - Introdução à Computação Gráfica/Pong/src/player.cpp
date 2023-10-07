@@ -2,6 +2,7 @@
 
 Player::Player(Vertex initialPosition){
     size = {(int) (WINDOW_WIDTH * 0.025), (int) (WINDOW_HEIGHT * 0.25)};
+    score = 0;
     speed = 10;
     controls = {false, false};
     position = initialPosition;
@@ -23,6 +24,19 @@ void Player::draw(){
         glVertex2i(position.x - size.x/2, position.y - size.y/2);
     glEnd();
 }
+
+bool Player::collide(Vertex ballPos, int ballRadius){
+    float closestX = (ballPos.x < position.x-size.x/2 ? position.x-size.x/2 : (ballPos.x > position.x+size.x/2 ? position.x+size.x/2 : ballPos.x));
+    float closestY = (ballPos.y < position.y-size.y/2 ? position.y-size.y/2 : (ballPos.y > position.y+size.y/2 ? position.y+size.y/2 : ballPos.y));
+    float dx = closestX - ballPos.x;
+    float dy = closestY - ballPos.y;
+
+    return ( dx * dx + dy * dy ) <= ballRadius * ballRadius;
+    // return ballPos.x - ballRadius <= position.x + size.x/2 &&
+    //        ballPos.y + ballRadius >= position.y - size.y/2 &&
+    //        ballPos.y - ballRadius <= position.y + size.y/2;
+}
+
 
 void Player::reset(){
     position = defaultPosition;

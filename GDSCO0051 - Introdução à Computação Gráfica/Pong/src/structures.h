@@ -12,6 +12,11 @@ struct Vertex{
         x>0 ? x++ : x--;
         y>0 ? y++ : y--;
     }
+
+    void operator +=(const Vertex &other){
+        x += other.x;
+        y += other.y;
+    }
 };
 
 struct PlayerControls{
