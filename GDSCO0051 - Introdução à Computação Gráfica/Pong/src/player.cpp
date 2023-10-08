@@ -3,7 +3,7 @@
 Player::Player(Vertex initialPosition){
     size = {(int) (WINDOW_WIDTH * 0.025), (int) (WINDOW_HEIGHT * 0.25)};
     score = 0;
-    speed = 10;
+    speed = WINDOW_HEIGHT*0.017;
     controls = {false, false};
     position = initialPosition;
     defaultPosition = initialPosition;

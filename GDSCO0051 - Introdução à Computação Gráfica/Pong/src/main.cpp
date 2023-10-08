@@ -8,8 +8,8 @@
 #include "ball.h"
 
 Audio *audioPlayer = new Audio();
-Player *player1 = new Player({50, WINDOW_HEIGHT/2});
-Player *player2 = new Player({WINDOW_WIDTH - 50, WINDOW_HEIGHT/2});
+Player *player1 = new Player({(int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
+Player *player2 = new Player({WINDOW_WIDTH - (int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
 Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer);
 bool isPaused = false;
 

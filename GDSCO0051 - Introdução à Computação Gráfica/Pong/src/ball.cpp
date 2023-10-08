@@ -1,11 +1,12 @@
 #include "ball.h"
 
 Ball::Ball(Vertex initialPosition, Audio *audioPlayerPtr){
-    samples = 16;
-    radius = 16;
-    defaultSpeed = {3, 0};
+    samples = WINDOW_WIDTH*0.02;
+    radius = WINDOW_WIDTH*0.02;
+    defaultSpeed = { (int)(WINDOW_WIDTH*0.005), 0};
     speed = getRandomDirection();
     lastCollision = 0;
+    followingId = 0;
     position = initialPosition;
     defaultPosition = initialPosition;
     audioPlayer = audioPlayerPtr;

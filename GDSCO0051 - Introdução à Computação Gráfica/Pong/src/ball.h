@@ -16,6 +16,7 @@ class Ball{
         Vertex defaultSpeed;
         Audio *audioPlayer;
         char lastCollision;
+        char followingId;
 
         Vertex getRandomDirection();
         void playerCollision(Player *player, char id);
