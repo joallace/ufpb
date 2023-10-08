@@ -17,7 +17,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 -include $(OBJECTS:.o=.d)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	@echo  "\033[31m \nCompiling $<: \033[0m"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 	@echo  "\033[32m \nCreating $< dependency file: \033[0m"
@@ -26,11 +26,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@sed -e 's|.*:|$(basename $@).o:|' < $(basename $@).d.tmp > $(basename $@).d
 	@rm -f $(basename $@).d.tmp
 
+$(OBJDIR):
+	mkdir -p $@
+
 clean:
 	@echo "\033[31mCleaning obj directory... \033[0m"
 	@rm $(EXECUTABLE) -f $(OBJDIR)/*.o $(OBJDIR)/*.d
 
-
-rebuild: clean $(EXECUTABLE)
-
+rebuild:
+	clean $(EXECUTABLE)
 	
