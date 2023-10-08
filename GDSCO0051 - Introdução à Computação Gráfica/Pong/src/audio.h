@@ -20,6 +20,7 @@ class Audio{
         void hit();
         void wallHit();
         void menu();
+        void pause();
 };
 
 #endif

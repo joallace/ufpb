@@ -3,7 +3,7 @@
 Ball::Ball(Vertex initialPosition, Audio *audioPlayerPtr){
     samples = 16;
     radius = 16;
-    defaultSpeed = {3, 3};
+    defaultSpeed = {3, 0};
     speed = getRandomDirection();
     lastCollision = 0;
     position = initialPosition;
@@ -18,7 +18,20 @@ Vertex Ball::getRandomDirection(){
     return {defaultSpeed.x * (xDirection? 1 : -1), defaultSpeed.y * (yDirection? 1 : -1)};
 }
 
-void Ball::collide(Player *player1, Player *player2){
+void Ball::playerCollision(Player *player, char id){
+    if(lastCollision != id && player->collide(position, radius)){
+        audioPlayer->hit();
+        lastCollision = id;
+        if(player->controls.down)
+            speed.y++;
+        if(player->controls.up)
+            speed.y--;
+        speed.x *= -1;
+        ++speed;
+    }
+}
+
+void Ball::moveAndCollide(Player *player1, Player *player2){
     if((position.x - radius < 0 && ++(player2->score)) || (position.x + radius> WINDOW_WIDTH && ++(player1->score))){
         audioPlayer->goal();
         reset();
@@ -29,17 +42,8 @@ void Ball::collide(Player *player1, Player *player2){
         speed.y *= -1;
     }
 
-    if((lastCollision != 1 && player1->collide(position, radius) && (lastCollision = 1)) ||
-       (lastCollision != 2 && player2->collide(position, radius)) && (lastCollision = 2)){
-        audioPlayer->hit();
-        speed.x *= -1;
-        ++speed;
-    }
-}
-
-
-void Ball::moveAndCollide(Player *player1, Player *player2){
-    collide(player1, player2);
+    playerCollision(player1, 1);
+    playerCollision(player2, 2);
     
     position += speed;
 }

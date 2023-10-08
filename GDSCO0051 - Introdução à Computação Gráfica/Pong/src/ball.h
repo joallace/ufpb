@@ -18,7 +18,7 @@ class Ball{
         char lastCollision;
 
         Vertex getRandomDirection();
-        void collide(Player *player1, Player *player2);
+        void playerCollision(Player *player, char id);
 
 
     public:

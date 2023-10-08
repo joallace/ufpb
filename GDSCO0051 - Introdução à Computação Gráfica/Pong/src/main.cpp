@@ -96,6 +96,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
             break;
         case 27:
             isPaused = !isPaused;
+            audioPlayer->pause();
             break;
     }
 }

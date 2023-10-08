@@ -35,3 +35,10 @@ void Audio::wallHit(){
 void Audio::menu(){
     ma_sound_start(&sounds[3]);
 }
+
+void Audio::pause(){
+    if(ma_sound_is_playing(&sounds[0]))
+        ma_sound_stop(&sounds[0]);
+    else
+        ma_sound_start(&sounds[0]);
+}
