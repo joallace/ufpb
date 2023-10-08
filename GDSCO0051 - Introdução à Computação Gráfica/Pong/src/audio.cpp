@@ -12,12 +12,15 @@ Audio::Audio(){
             printf("Failed to open %s", files[i]);
     }
 
+    ma_sound_set_volume(&sounds[0], 0.35f);
     ma_sound_set_looping(&sounds[0], true);
     ma_sound_start(&sounds[0]);
 }
 
 Audio::~Audio(){
     ma_engine_uninit(&engine);
+    for (int i = 0; i < 5; i++)
+        ma_sound_uninit(&sounds[i]);
 }
 
 void Audio::goal(){
