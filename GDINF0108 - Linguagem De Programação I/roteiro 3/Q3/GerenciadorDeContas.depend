@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1554925985 source:c:\users\aluno\desktop\nova pasta\gerenciadordecontas\src\conta.cpp
+	"Conta.h"
+
+1554928464 c:\users\aluno\desktop\nova pasta\gerenciadordecontas\include\conta.h
+	<string>
+
+1554927341 source:c:\users\aluno\desktop\nova pasta\gerenciadordecontas\src\contacorrente.cpp
+	"ContaCorrente.h"
+
+1554928499 c:\users\aluno\desktop\nova pasta\gerenciadordecontas\include\contacorrente.h
+	<Conta.h>
+
+1554928954 source:c:\users\aluno\desktop\nova pasta\gerenciadordecontas\src\main.cpp
+	<iostream>
+	<ContaEspecial.h>
+	<Poupanca.h>
+
+1554927333 c:\users\aluno\desktop\nova pasta\gerenciadordecontas\include\contaespecial.h
+	<ContaCorrente.h>
+
+1554926394 c:\users\aluno\desktop\nova pasta\gerenciadordecontas\include\poupanca.h
+	<Conta.h>
+
+1554928873 source:c:\users\aluno\desktop\nova pasta\gerenciadordecontas\src\contaespecial.cpp
+	"ContaEspecial.h"
+
+1554928612 source:c:\users\aluno\desktop\nova pasta\gerenciadordecontas\src\poupanca.cpp
+	"Poupanca.h"
+

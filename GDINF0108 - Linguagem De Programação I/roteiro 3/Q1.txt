@@ -1,0 +1,43 @@
+O polimorfismo é um conceito no gerenciamento de classes que, resumidamente, possibilita o mesmo tratamento a uma classe e a quaisquer outras classes que a herdem.
+
+Por exemplo, em um sistema bancário, podemos ter:
+
+    class Conta{
+        private:
+            ...
+        public:
+            virtual void calcularLimite(){
+                limite = salario;
+            }
+    };
+
+    class ContaEspecial: public Conta{
+        private:
+            ...
+        public:
+            void calcularLimite(){
+                limite = 2*salario;
+            }
+    };
+
+    class ContaUniversitaria: public Conta{
+        private:
+            ...
+        public:
+            void calcularLimite(){
+                if(salario == 0)
+                    limite = 300;
+                else
+                    limite = salario;
+            }
+    };
+            
+    int main(){
+        ContaUniversitaria c1 = ...;
+        ContaEspecial ce1 = ...;
+        Conta *contas[2] = ...;
+      
+        for(int i =0; i < 2; i++)
+            contas[i]->calculaLimite(); //Array polimórfico utilizando de um método que é comum à classe e suas sub-classes
+
+    }

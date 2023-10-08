@@ -1,0 +1,66 @@
+# depslib dependency file v1.0
+1553177470 source:c:\users\aluno\documents\lp1\lista\q2\src\conta.cpp
+	"Conta.h"
+	<iostream>
+	"stdio.h"
+
+1553176151 c:\users\aluno\documents\lp1\lista\q2\include\conta.h
+	<IConta.h>
+	<string>
+
+1553175488 c:\users\aluno\documents\lp1\lista\q2\include\iconta.h
+
+1553176356 source:c:\users\aluno\documents\lp1\lista\q2\src\contaespecial.cpp
+	"ContaEspecial.h"
+
+1553176302 c:\users\aluno\documents\lp1\lista\q2\include\contaespecial.h
+	<Conta.h>
+
+1553177380 source:c:\users\aluno\documents\lp1\lista\q2\main.cpp
+	<iostream>
+	"ContaEspecial.h"
+
+1553177489 source:e:\bibliotecas\downloads\q2\main.cpp
+	<iostream>
+	"ContaEspecial.h"
+
+1553176302 e:\bibliotecas\downloads\q2\include\contaespecial.h
+	<Conta.h>
+
+1553176151 e:\bibliotecas\downloads\q2\include\conta.h
+	<IConta.h>
+	<string>
+
+1553175488 e:\bibliotecas\downloads\q2\include\iconta.h
+
+1553176356 source:e:\bibliotecas\downloads\q2\src\contaespecial.cpp
+	"ContaEspecial.h"
+
+1553177515 source:e:\bibliotecas\downloads\q2\src\conta.cpp
+	"Conta.h"
+	<iostream>
+	"stdio.h"
+
+1554409107 source:e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\main.cpp
+	<iostream>
+	"ContaEspecial.h"
+
+1553176302 e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\include\contaespecial.h
+	<Conta.h>
+
+1554408731 e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\include\conta.h
+	<IConta.h>
+	<SaldoNaoDisponivelException.h>
+	<string>
+
+1553175488 e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\include\iconta.h
+
+1554408585 e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\include\saldonaodisponivelexception.h
+	<exception>
+
+1554408849 source:e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\src\conta.cpp
+	"Conta.h"
+
+1553176356 source:e:\bibliotecas\documents\ufpb\atividades\c++\lista maritan\lista 2\q2-q6\src\contaespecial.cpp
+	"ContaEspecial.h"
+

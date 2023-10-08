@@ -1,0 +1,31 @@
+1) O que são classes e objetos numa linguagem de programação orientada a objetos? Explique a
+diferença entre os dois.
+
+R:
+->Classe: É uma estrutura capaz de armazenar atributos de diferentes tipos, além de possuir métodos, que irão
+  definir o comportamento da classe. Tais métodos também são capazes de alterar os atributos da classe.
+
+->Objeto: É uma instância de uma classe. Podem haver diferentes objetos da mesma classe.
+
+->Diferença: O objeto não passa de uma instância da classe. Já a classe é o "molde" capaz de gerar múltiplos
+  objetos, cada um com diferentes valores para seus atributos.
+
+
+2) Para que serve um construtor e quando e como ele pode ser utilizado?
+
+R: Um construtor é utilizado para a inicialização de um objeto, podendo ser usado para iniciar o objeto
+com seus atributos vazios, ou simplesmente para iniciá-lo com certos valores desejados.
+
+
+3) Qual é o propósito da palavra reservada new? Explique o que acontece quando você a utiliza.
+
+R: O operador new tem a serventia de reservar um espaço de memória em tempo de execução. Ao ser utilizado
+ele retorna o endereço de memória do espaço reservado.
+
+
+4) Qual são os benefícios do encapsulamento na programação orientada a objetos? Exemplifique.
+
+R: O encapsulamento permite omitir atributos e/ou métodos de uma classe, desse modo, é possível ocultar os
+detalhes de implementação, e aumentar a confiabilidade do programa, visto que restringiria o acesso à atributos
+de valor sensível. Além disso é possível a criação de métodos que controlem a leitura e escrita de um atributo(getters e setters).
+Como exemplo, poderia-se evitar a alteração de um atributo "totalVendas" de uma classe "Caixa", porém permitir sua leitura.
