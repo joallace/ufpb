@@ -4,7 +4,6 @@ module program_counter(input clock,
 							  input increment,		//Cp
 							  output logic [3:0] w_bus);
 
-	  
 	logic [3:0] address;
 
 	always_ff @(negedge clock or negedge reset) begin
