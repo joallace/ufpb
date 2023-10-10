@@ -2,7 +2,7 @@ module instruction_register(input clock,
 									 input reset,
 									 input output_to_bus,		//Ei
 									 input load_i,				   //Su (0 = sum, 1 = sub)
-									 inout logic [7:0] w_bus)
+									 inout logic [7:0] w_bus);
 			 
 	logic [7:0] ir;
 
