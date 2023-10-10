@@ -11,6 +11,11 @@ module SAP(input clock,
 	logic [7:0] b_reg;
 	
 //	program_counter pc (.clock(clock), .reset(reset))
+
+	initial begin
+		reset = 1;
+		reset = 0;
+	end
 	
 	always_ff @(posedge clock) begin
 		if(~load_b)

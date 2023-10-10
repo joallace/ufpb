@@ -7,8 +7,8 @@ module instruction_register(input clock,
 			 
 	logic [7:0] i_reg;
 
-	always_ff @(posedge clock or negedge reset) begin
-		if(~reset)
+	always_ff @(posedge clock or posedge reset) begin
+		if(reset)
 			i_reg <= 0;
 			
 		if(output_to_bus)
