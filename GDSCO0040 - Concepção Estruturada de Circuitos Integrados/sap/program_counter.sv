@@ -10,6 +10,7 @@ module program_counter(input clock,
 	always_ff @(negedge clock) begin
 		if(output_to_bus)
 			w_bus <= address;
+			
 		if(increment)
 			address <= address + 1;
 	end	
