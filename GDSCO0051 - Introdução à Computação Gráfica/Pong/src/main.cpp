@@ -96,6 +96,10 @@ void handleKeyboard(unsigned char key, int x, int y) {
         case 27:
             isPaused = !isPaused;
             audioPlayer->pause();
+            if(isPaused)
+                glColor3f(0.5f, 0.5f, 0.5f);
+            else
+                glColor3f(1.0f, 1.0f, 1.0f);
             break;
     }
 }
