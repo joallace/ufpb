@@ -5,7 +5,7 @@ Audio::Audio(){
     if (result != MA_SUCCESS)
         printf("Failed to initialize audio engine.");
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         result = ma_sound_init_from_file(&engine, files[i], MA_SOUND_FLAG_DECODE, NULL, NULL, &sounds[i]);
 
         if (result != MA_SUCCESS)
@@ -32,11 +32,18 @@ void Audio::hit(){
 }
 
 void Audio::wallHit(){
+    ma_sound_start(&sounds[3]);
+}
+
+void Audio::powerup(){
+    // ma_sound_set_start_time_in_pcm_frames(&sounds[4], ma_engine_get_time_in_pcm_frames(&engine) + (ma_engine_get_sample_rate(&engine) * 1));
+    ma_sound_seek_to_pcm_frame(&sounds[4], 0);
     ma_sound_start(&sounds[4]);
 }
 
-void Audio::menu(){
-    ma_sound_start(&sounds[3]);
+void Audio::kick(){
+    ma_sound_stop(&sounds[4]);
+    ma_sound_start(&sounds[5]);
 }
 
 void Audio::pause(){
@@ -44,4 +51,8 @@ void Audio::pause(){
         ma_sound_stop(&sounds[0]);
     else
         ma_sound_start(&sounds[0]);
+}
+
+bool Audio::isPoweringUp(){
+    return ma_sound_is_playing(&sounds[4]);
 }

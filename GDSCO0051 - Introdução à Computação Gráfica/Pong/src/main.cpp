@@ -1,3 +1,11 @@
+/*
+Projeto Pong
+
+Membros:
+    João Wallace Lucena Lins - 20180027213
+    Hellyson Barbosa Tertuliano - 20190168716 
+*/
+
 #include <GL/glut.h>
 #include <math.h>
 #include <ctime>
@@ -10,7 +18,7 @@
 Audio *audioPlayer = new Audio();
 Player *player1 = new Player({(int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
 Player *player2 = new Player({WINDOW_WIDTH - (int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
-Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer);
+Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer, false);
 bool isPaused = false;
 
 void initializeGlut(int argc, char *argv[]){
@@ -80,6 +88,16 @@ void update(int value) {
         player2->move();
     }
 
+    if(player1->score == 10){
+        printf("Parabéns, o jogador 1 venceu!\n");
+        exit(0);
+    }
+
+    if(player2->score == 10){
+        printf("Parabéns, o jogador 2 venceu!\n");
+        exit(0);
+    }
+
     glutPostRedisplay();
     glutTimerFunc(16, update, 0);
 }
@@ -94,6 +112,21 @@ void handleKeyboard(unsigned char key, int x, int y) {
         case 's':
             player1->controls.down = true;
             break;
+        case 32:
+            if(ball->isFollowing())
+                audioPlayer->powerup();
+        //     switch (ball->getFollowingId()){
+        //     case 1:
+        //         /* code */
+        //         break;
+        //     case 2:
+        //         player2->
+        //         break;            
+        //     default:
+        //         break;
+        //     }
+            break;
+        
         case 27:
             isPaused = !isPaused;
             audioPlayer->pause();
@@ -110,6 +143,12 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
         case 'S':
         case 's':
             player1->controls.down = false;
+            break;
+        case 32:
+            if(ball->isFollowing()){
+                ball->release(!audioPlayer->isPoweringUp());
+                audioPlayer->kick();
+            }
             break;
     }
 }

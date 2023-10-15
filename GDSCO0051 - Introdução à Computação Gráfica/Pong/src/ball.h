@@ -17,19 +17,22 @@ class Ball{
         Audio *audioPlayer;
         char lastCollision;
         char followingId;
+        bool isClassicGameMode;
 
         Vertex getRandomDirection();
         void playerCollision(Player *player, char id);
 
 
     public:
-        Ball(Vertex initialPosition, Audio *audioPlayerPtr);
+        Ball(Vertex initialPosition, Audio *audioPlayerPtr, bool isClassicGameMode);
         Vertex speed;
         Vertex position;
 
         void moveAndCollide(Player *player1, Player *player2);
         void draw();
         void reset();
+        void release(bool maxSpeed);
+        bool isFollowing();
 };
 
 #endif

@@ -7,8 +7,8 @@
 
 class Audio{
     private:
-        char* files[5] = {"assets/music.mp3", "assets/goal.wav", "assets/hit.wav", "assets/menu.wav", "assets/wallHit.wav"};
-        ma_sound sounds[5];
+        char* files[6] = {"assets/music.mp3", "assets/goal.wav", "assets/hit.wav", "assets/wallHit.wav", "assets/powerup.wav", "assets/kick.wav"};
+        ma_sound sounds[6];
         ma_engine engine;
         ma_result result;
 
@@ -18,6 +18,10 @@ class Audio{
 
         void goal();
         void hit();
+        void powerup();
+        void stopPowerup();
+        bool isPoweringUp();
+        void kick();
         void wallHit();
         void menu();
         void pause();

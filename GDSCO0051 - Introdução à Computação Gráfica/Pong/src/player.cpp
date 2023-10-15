@@ -32,9 +32,6 @@ bool Player::collide(Vertex ballPos, int ballRadius){
     float dy = closestY - ballPos.y;
 
     return ( dx * dx + dy * dy ) <= ballRadius * ballRadius;
-    // return ballPos.x - ballRadius <= position.x + size.x/2 &&
-    //        ballPos.y + ballRadius >= position.y - size.y/2 &&
-    //        ballPos.y - ballRadius <= position.y + size.y/2;
 }
 
 
