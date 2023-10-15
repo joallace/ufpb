@@ -16,8 +16,8 @@ Membros:
 #include "ball.h"
 
 Audio *audioPlayer = new Audio();
-Player *player1 = new Player({(int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
-Player *player2 = new Player({WINDOW_WIDTH - (int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
+Player *player1 = new Player(1, {(int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
+Player *player2 = new Player(2, {WINDOW_WIDTH - (int)(WINDOW_HEIGHT*0.0625), WINDOW_HEIGHT/2});
 Ball *ball = new Ball({WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, audioPlayer, false);
 bool isPaused = false;
 
@@ -51,31 +51,16 @@ void drawDashedLine(){
     glEnd();
 }
 
-void drawScores(){
-    char score[3];
-    
-    // Player 1 Score
-    glRasterPos2i(WINDOW_WIDTH/2 - 50, 100);
-    sprintf(score, "%d", player1->score);
-    for(int i=0; i<3; i++){
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score[i]);
-    }
-
-    // Player 2 Score
-    glRasterPos2i(WINDOW_WIDTH/2 + 50, 100);
-    sprintf(score, "%d", player2->score);
-    for(int i=0; i<3; i++){
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score[i]);
-    }
-}
-
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
-
     drawDashedLine();
-    drawScores();
+
     player1->draw();
+    player1->drawScore({WINDOW_WIDTH/2 - 50, 100});
+
     player2->draw();
+    player2->drawScore({WINDOW_WIDTH/2 + 50, 100});
+
     ball->draw();
 
     glutSwapBuffers();
@@ -115,18 +100,7 @@ void handleKeyboard(unsigned char key, int x, int y) {
         case 32:
             if(ball->isFollowing())
                 audioPlayer->powerup();
-        //     switch (ball->getFollowingId()){
-        //     case 1:
-        //         /* code */
-        //         break;
-        //     case 2:
-        //         player2->
-        //         break;            
-        //     default:
-        //         break;
-        //     }
             break;
-        
         case 27:
             isPaused = !isPaused;
             audioPlayer->pause();
@@ -145,10 +119,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
             player1->controls.down = false;
             break;
         case 32:
-            if(ball->isFollowing()){
-                ball->release(!audioPlayer->isPoweringUp());
-                audioPlayer->kick();
-            }
+            ball->release();
             break;
     }
 }

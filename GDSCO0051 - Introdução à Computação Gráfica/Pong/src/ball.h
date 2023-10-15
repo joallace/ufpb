@@ -20,7 +20,7 @@ class Ball{
         bool isClassicGameMode;
 
         Vertex getRandomDirection();
-        void playerCollision(Player *player, char id);
+        void playerCollision(Player *player);
 
 
     public:
@@ -31,7 +31,7 @@ class Ball{
         void moveAndCollide(Player *player1, Player *player2);
         void draw();
         void reset();
-        void release(bool maxSpeed);
+        void release();
         bool isFollowing();
 };
 

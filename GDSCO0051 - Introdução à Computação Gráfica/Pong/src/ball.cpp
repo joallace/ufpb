@@ -15,12 +15,13 @@ Ball::Ball(Vertex initialPosition, Audio *audioPlayerPtr, bool isClassicGameMode
 
 Vertex Ball::getRandomDirection(){
     bool xDirection = rand() & 1;
-    bool yDirection = rand() & 1;
 
-    return {defaultSpeed.x * (xDirection? 1 : -1), defaultSpeed.y * (yDirection? 1 : -1)};
+    return {defaultSpeed.x * (xDirection? 1 : -1), 0};
 }
 
-void Ball::playerCollision(Player *player, char id){
+void Ball::playerCollision(Player *player){
+    char id = player->getId();
+
     if(lastCollision != id && player->collide(position, radius)){
         audioPlayer->hit();
         lastCollision = id;
@@ -49,13 +50,15 @@ void Ball::moveAndCollide(Player *player1, Player *player2){
             speed.y *= -1;
         }
 
-        playerCollision(player1, 1);
-        playerCollision(player2, 2);
+        playerCollision(player1);
+        playerCollision(player2);
         
         position += speed;
     }
+
     if(followingId == 1)
         position = {player1->position.x+player1->getSize().x/2+radius, player1->position.y};
+
     if(followingId == 2)
         position = {player2->position.x-player2->getSize().x/2-radius, player2->position.y};
 }
@@ -79,9 +82,9 @@ void Ball::reset(){
     speed = getRandomDirection();
 }
 
-void Ball::release(bool maxSpeed){
+void Ball::release(){
     if(followingId){
-        if(maxSpeed)
+        if(!audioPlayer->isPoweringUp())
             speed = {15, 0};
         else
             speed = {7, 0};
@@ -90,6 +93,7 @@ void Ball::release(bool maxSpeed){
             speed.x *= -1;
 
         followingId = 0;
+        audioPlayer->kick();
     }
 }
 

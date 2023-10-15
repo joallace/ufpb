@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <GL/glut.h>
+#include <stdio.h>
 #include "structures.h"
 
 class Player{
@@ -9,9 +10,10 @@ class Player{
         Vertex size;
         Vertex defaultPosition;
         int speed;
+        char id;
 
     public:
-        Player(Vertex initialPosition);
+        Player(char id, Vertex initialPosition);
 
         int score;
         PlayerControls controls;
@@ -19,8 +21,10 @@ class Player{
 
         void move();
         void draw();
-        void reset();
+        void drawScore(Vertex position);
+        char goal();
         bool collide(Vertex ballPos, int ballRadius);
+        char getId();
         Vertex getSize();
 };
 
