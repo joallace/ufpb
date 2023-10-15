@@ -1,11 +1,3 @@
-/*
-Projeto Pong
-
-Membros:
-    João Wallace Lucena Lins - 20180027213
-    Hellyson Barbosa Tertuliano - 20190168716 
-*/
-
 #include <GL/glut.h>
 #include <math.h>
 #include <ctime>

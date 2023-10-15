@@ -19,11 +19,9 @@ class Audio{
         void goal();
         void hit();
         void powerup();
-        void stopPowerup();
         bool isPoweringUp();
         void kick();
         void wallHit();
-        void menu();
         void pause();
 };
 

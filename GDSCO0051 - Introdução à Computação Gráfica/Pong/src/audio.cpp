@@ -36,7 +36,6 @@ void Audio::wallHit(){
 }
 
 void Audio::powerup(){
-    // ma_sound_set_start_time_in_pcm_frames(&sounds[4], ma_engine_get_time_in_pcm_frames(&engine) + (ma_engine_get_sample_rate(&engine) * 1));
     ma_sound_seek_to_pcm_frame(&sounds[4], 0);
     ma_sound_start(&sounds[4]);
 }

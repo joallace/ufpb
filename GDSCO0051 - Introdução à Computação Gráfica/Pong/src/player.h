@@ -22,7 +22,6 @@ class Player{
         void move();
         void draw();
         void drawScore(Vertex position);
-        char goal();
         bool collide(Vertex ballPos, int ballRadius);
         char getId();
         Vertex getSize();
