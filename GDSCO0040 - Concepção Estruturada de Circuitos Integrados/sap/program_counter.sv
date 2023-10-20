@@ -2,7 +2,7 @@ module program_counter(input clock,
 							  input reset,
 							  input output_to_bus,  //Ep
 							  input increment,		//Cp
-							  output logic [3:0] w_bus);
+							  output logic [7:0] w_bus);
 
 	logic [3:0] address;
 
@@ -10,10 +10,10 @@ module program_counter(input clock,
 		if(~reset)
 			address <= 0;
 
-		if(output_to_bus)
+		else if(output_to_bus)
 			w_bus <= address;
 			
-		if(increment)
+		else if(increment)
 			address <= address + 1;
 	end	
 endmodule
