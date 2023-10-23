@@ -29,22 +29,22 @@ module SAP(input clock,
 		reset = 1;
 		reset = 0;
 		
-		ram = '{8'b00001111,
-				  8'b00011110,
-				  8'b00011101,
-				  8'b00101100,
-				  8'b1110xxxx,
-				  8'b1111xxxx,
+		ram = '{8'b00001111,		// LDA 0xF
+				  8'b00011110,		// ADD 0xE
+				  8'b00011101,		// ADD 0xD
+				  8'b00101100,		// SUB 0xC
+				  8'b1110xxxx,		// OUT
+				  8'b1111xxxx,		// HLT
 				  8'b0,
 				  8'b0,
 				  8'b0,
 				  8'b0,
 				  8'b0,
 				  8'b0,
-				  8'b00000110,
-				  8'b00000010,
-				  8'b00001000,
-				  8'b00001010};
+				  8'b00000100,		// 4
+				  8'b00000010,		// 2
+				  8'b00001000,		// 8
+				  8'b00001010};		// 10
 	end
 	
 	program_counter pc (.clock(clock), .reset(reset), .output_to_bus(pc_to_bus), .increment(increment_pc), .w_bus(w_bus));

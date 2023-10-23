@@ -8,7 +8,7 @@ module program_counter(input clock,
 
 	always_ff @(negedge clock or negedge reset) begin
 		if(~reset)
-			address <= 0;
+			address <= 4'b0;
 		else begin
 			if (output_to_bus)
 				w_bus <= address;

@@ -18,8 +18,8 @@ module instruction_register(input clock,
 			else
 				i_reg <= i_reg;
 				
-			if(output_to_bus)
-				w_bus <= {4'bz, i_reg[3:0]};
+			if(~output_to_bus)
+				w_bus <= {4'b0, i_reg[3:0]};
 			else
 				w_bus <= 8'bz;
 		end
