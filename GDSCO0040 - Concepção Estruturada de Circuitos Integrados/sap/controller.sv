@@ -1,6 +1,6 @@
 module controller(inout clock,
 						input [3:0] instruction,
-						output logic [11:0] control_word);
+						output [11:0] control_word);
 
 	logic [2:0] current_state;
 	parameter t1 = 3'd0, t2 = 3'd1, t3 = 3'd2, t4 = 3'd3, t5 = 3'd4, t6 = 3'd5;
@@ -11,7 +11,7 @@ module controller(inout clock,
 			if(current_state == t6)
 				current_state <= t1;
 			else
-				current_state = current_state + 1;
+				current_state <= current_state + 1;
 	end
 	
 	always_comb begin

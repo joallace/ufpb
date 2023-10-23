@@ -2,7 +2,7 @@ module SAP(input clock,
 //			  input reset,							//clear					
 			  output logic [7:0] output_reg);
 			  
-   logic [11:0] control_word;
+   wire [11:0] control_word;
 	logic increment_pc,		// Cp
 			pc_to_bus,			// Ep
 			load_mem,			// Lm
@@ -34,21 +34,23 @@ module SAP(input clock,
 	
 	controller ctrlr (.clock(clock), .instruction(instruction), .control_word(control_word));
 	
-//	accumulator acc (.clock(clock), .output_to_bus(a_to_bus), .load_a(load_a), .ula_input(ula_input), .w_bus(w_bus));
+	accumulator acc (.clock(clock), .output_to_bus(a_to_bus), .load_a(load_a), .ula_input(ula_input), .w_bus(w_bus));
 	
 	adder_subtractor ula (.output_to_bus(op_result_to_bus), .mode(operation), .a(ula_input), .b(b_reg), .w_bus(w_bus));
 	
-//	instruction_register ir (.clock(clock), .reset(reset), .output_to_bus(ir_to_bus), .load_ir(load_ir), .instruction(instruction), .w_bus(w_bus));
+	instruction_register ir (.clock(clock), .reset(reset), .output_to_bus(ir_to_bus), .load_ir(load_ir), .instruction(instruction), .w_bus(w_bus));
 	
+	assign {increment_pc, pc_to_bus, load_mem, ram_to_bus, load_ir, ir_to_bus, load_a, a_to_bus, operation, ula_to_bus, load_b, load_out} = control_word;
+
 	always_ff @(posedge clock) begin
 		if(~load_b)
 			b_reg <= w_bus;
+		else
+			b_reg <= b_reg;
 			
-		if(a_to_bus && ~load_out)
+		if(~load_out)
 			output_reg <= w_bus;
-	end
-	
-	always_comb begin
-		{increment_pc, pc_to_bus, load_mem, ram_to_bus, load_ir, ir_to_bus, load_a, a_to_bus, operation, op_result_to_bus, load_b, load_out} = control_word;
+		else
+			output_reg <= 8'bz;
 	end
 endmodule
