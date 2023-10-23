@@ -12,7 +12,7 @@ module SAP(input clock,
 			load_a,				// La
 			a_to_bus,			// Ea
 			operation,			// Su
-			op_result_to_bus,	// Eu
+			ula_to_bus,			// Eu
 			load_b,				// Lb
 			load_out;			// Lo
 	logic [7:0] ram [15:0];
@@ -36,13 +36,23 @@ module SAP(input clock,
 	
 	accumulator acc (.clock(clock), .output_to_bus(a_to_bus), .load_a(load_a), .ula_input(ula_input), .w_bus(w_bus));
 	
-	adder_subtractor ula (.output_to_bus(op_result_to_bus), .mode(operation), .a(ula_input), .b(b_reg), .w_bus(w_bus));
+	adder_subtractor ula (.output_to_bus(ula_to_bus), .mode(operation), .a(ula_input), .b(b_reg), .w_bus(w_bus));
 	
 	instruction_register ir (.clock(clock), .reset(reset), .output_to_bus(ir_to_bus), .load_ir(load_ir), .instruction(instruction), .w_bus(w_bus));
 	
 	assign {increment_pc, pc_to_bus, load_mem, ram_to_bus, load_ir, ir_to_bus, load_a, a_to_bus, operation, ula_to_bus, load_b, load_out} = control_word;
 
 	always_ff @(posedge clock) begin
+		if(~load_mem)
+			rem <= w_bus[3:0];
+		else
+			rem <= rem;
+			
+		if(ram_to_bus)
+			w_bus <= ram[rem];
+		else
+			w_bus <= 8'bz;
+	
 		if(~load_b)
 			b_reg <= w_bus;
 		else
