@@ -28,6 +28,23 @@ module SAP(input clock,
 	initial begin
 		reset = 1;
 		reset = 0;
+		
+		ram = '{8'b00001111,
+				  8'b00011110,
+				  8'b00011101,
+				  8'b00101100,
+				  8'b1110xxxx,
+				  8'b1111xxxx,
+				  8'b0,
+				  8'b0,
+				  8'b0,
+				  8'b0,
+				  8'b0,
+				  8'b0,
+				  8'b00000110,
+				  8'b00000010,
+				  8'b00001000,
+				  8'b00001010};
 	end
 	
 	program_counter pc (.clock(clock), .reset(reset), .output_to_bus(pc_to_bus), .increment(increment_pc), .w_bus(w_bus));
