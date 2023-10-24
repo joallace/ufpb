@@ -1,34 +1,34 @@
 module SAP(input clock, 
 //			  input reset,							//clear					
-			  output logic [7:0] output_reg);
+			  output logic [7:0] output_reg,
+			  output logic [7:0] w_bus,
+			  output wire [3:0] instruction,
+			  output logic increment_pc,		// Cp
+						pc_to_bus,			// Ep
+						load_mem,			// Lm
+						ram_to_bus,			// Ce
+						load_ir,				// Li
+						ir_to_bus,			// Ei
+						load_a,				// La
+						a_to_bus,			// Ea
+						operation,			// Su
+						ula_to_bus,			// Eu
+						load_b,				// Lb
+						load_out 			// Lo
+				);		
 			  
    wire [11:0] control_word;
-	logic increment_pc,		// Cp
-			pc_to_bus,			// Ep
-			load_mem,			// Lm
-			ram_to_bus,			// Ce
-			load_ir,				// Li
-			ir_to_bus,			// Ei
-			load_a,				// La
-			a_to_bus,			// Ea
-			operation,			// Su
-			ula_to_bus,			// Eu
-			load_b,				// Lb
-			load_out;			// Lo
+	
 	logic [7:0] ram [15:0];
 	logic [7:0] rem;
-	logic [7:0] w_bus;
+	
 	logic [7:0] b_reg;
 	
 	wire [7:0] ula_input;
-	wire [3:0] instruction;
 	
 	logic reset;
 
 	initial begin
-		reset = 1;
-		reset = 0;
-		
 		ram = '{8'b00001111,		// LDA 0xF
 				  8'b00011110,		// ADD 0xE
 				  8'b00011101,		// ADD 0xD
@@ -44,7 +44,11 @@ module SAP(input clock,
 				  8'b00000100,		// 4
 				  8'b00000010,		// 2
 				  8'b00001000,		// 8
-				  8'b00001010};		// 10
+				  8'b00001010};	// 10
+		#10ns;
+		reset = 1;
+		#20ns;
+		reset = 0;		
 	end
 	
 	program_counter pc (.clock(clock), .reset(reset), .output_to_bus(pc_to_bus), .increment(increment_pc), .w_bus(w_bus));
