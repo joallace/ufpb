@@ -2,10 +2,16 @@ module controller(inout clock,
 						input [3:0] instruction,
 						output [11:0] control_word);
 
-	logic [2:0] current_state;
 	parameter t1 = 3'd0, t2 = 3'd1, t3 = 3'd2, t4 = 3'd3, t5 = 3'd4, t6 = 3'd5;
 	parameter LDA = 4'b0000, ADD = 4'b0001, SUB = 4'b0010, OUT = 4'b1110, HALT = 4'b1111;
 	const logic [11:0] NOP = 12'b001111100011;
+	
+	logic [2:0] current_state;
+	
+	initial begin
+		current_state = t6;
+	end
+
 
 	always_ff @(posedge clock) begin
 			if(current_state == t6)

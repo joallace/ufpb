@@ -2,12 +2,15 @@ module program_counter(input clock,
 							  input reset,
 							  input output_to_bus,  //Ep
 							  input increment,		//Cp
-							  output logic [7:0] w_bus);
+							  output logic [7:0] w_bus,
+							  output wire [3:0] out);
 
 	logic [3:0] address;
 
-	always_ff @(negedge clock or negedge reset) begin
-		if(~reset)
+	assign out = address;
+	
+	always_ff @(negedge clock or posedge reset) begin
+		if(reset)
 			address <= 4'b0;
 		else begin
 			if (output_to_bus)
