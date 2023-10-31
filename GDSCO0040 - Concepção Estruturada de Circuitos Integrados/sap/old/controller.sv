@@ -13,7 +13,7 @@ module controller(inout clock,
 	end
 
 
-	always_ff @(negedge clock) begin
+	always_ff @(posedge clock) begin
 			if(current_state == t6)
 				current_state <= t1;
 			else

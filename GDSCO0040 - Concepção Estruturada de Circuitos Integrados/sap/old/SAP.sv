@@ -24,7 +24,6 @@ module SAP(input clock,
 				);		
 			  
    wire [11:0] control_word;
-	wire [7:0] ula_out;
 	logic [7:0] ram [15:0];
 	
 	logic reset;
@@ -38,12 +37,12 @@ module SAP(input clock,
 				  8'b0,
 				  8'b0,
 				  8'b0,
+				  8'b0,
+				  8'b0,
 				  8'b1111xxxx,     // HLT
 				  8'b1110xxxx,     // OUT
 				  8'b00101100,     // SUB 0xC
-				  8'b1110xxxx,     // OUT
 				  8'b00011101,     // ADD 0xD
-				  8'b1110xxxx,     // OUT
 				  8'b00011110,     // ADD 0xE
 				  8'b00001111};    // LDA 0xF
 
@@ -56,12 +55,9 @@ module SAP(input clock,
 	
 	controller ctrlr (.clock(clock), .instruction(instruction), .control_word(control_word));
 	
-	bus w (.clock(clock), .pc_to_bus(pc_to_bus), .ram_to_bus(ram_to_bus), .ir_to_bus(ir_to_bus),
-			 .a_to_bus(a_to_bus), .ula_to_bus(ula_to_bus), .pc(pc_out), .ram(current_mem), .ir(ir_out[3:0]), .acc(ula_input), .ula(ula_out), .w_bus(w_bus));
-	
 	accumulator acc (.clock(clock), .output_to_bus(a_to_bus), .load_a(load_a), .ula_input(ula_input), .w_bus(w_bus));
 	
-	adder_subtractor ula (.output_to_bus(ula_to_bus), .mode(operation), .a(ula_input), .b(b_reg), .out(ula_out));
+	adder_subtractor ula (.output_to_bus(ula_to_bus), .mode(operation), .a(ula_input), .b(b_reg), .w_bus(w_bus));
 	
 	instruction_register ir (.clock(clock), .reset(reset), .output_to_bus(ir_to_bus), .load_ir(load_ir), .instruction(instruction), .w_bus(w_bus), .out(ir_out));
 	
@@ -74,6 +70,11 @@ module SAP(input clock,
 		else
 			rem <= rem;
 			
+		if(~ram_to_bus)
+			w_bus <= ram[rem];
+		else
+			w_bus <= 8'bz;
+	
 		if(~load_b)
 			b_reg <= w_bus;
 		else
@@ -82,6 +83,6 @@ module SAP(input clock,
 		if(~load_out)
 			output_reg <= w_bus;
 		else
-			output_reg <= 8'b0;
+			output_reg <= 8'bz;
 	end
 endmodule
