@@ -25,10 +25,23 @@ void Ball::playerCollision(Player *player){
     if(lastCollision != id && player->collide(position, radius)){
         audioPlayer->hit();
         lastCollision = id;
-        if(player->controls.down)
-            speed.y++;
-        if(player->controls.up)
-            speed.y--;
+        if(speed.y > 0){
+            if(player->controls.down)
+                speed.y++;
+            if(player->controls.up){
+                speed.y = -speed.y;
+                speed.y--;
+            }
+        }
+        else{
+            if(player->controls.down){
+                speed.y = -speed.y;
+                speed.y++;
+            }
+            if(player->controls.up)
+                speed.y--;
+        }
+        
         speed.x *= -1;
         ++speed;
     }
