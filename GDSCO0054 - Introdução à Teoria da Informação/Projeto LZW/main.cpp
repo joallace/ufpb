@@ -7,6 +7,11 @@
 #include <bitset>
 #include <unordered_map>
 
+struct symbol {
+    unsigned value;
+    unsigned numberOfBits;
+};
+
 
 unsigned getMinimumNumberOfBits(unsigned number) {
     unsigned n = number-1;
@@ -20,17 +25,14 @@ unsigned getMinimumNumberOfBits(unsigned number) {
     return result < 8 ? 8 : result;
 }
 
-std::string concatenateBinary(const std::vector<unsigned>& numbers) {
+std::string concatenateBinary(const std::vector<symbol>& symbols) {
     std::string result;
-    for (unsigned num : numbers) {
-        // Convert number to binary string with fixed number of bits
-        int numberOfBits = getMinimumNumberOfBits(num);
-        result += std::bitset<32>(num).to_string().substr(32 - numberOfBits, numberOfBits);
-    }
+    for (symbol s : symbols)
+        result += std::bitset<32>(s.value).to_string().substr(32 - s.numberOfBits, s.numberOfBits);
     return result;
 }
 
-void writeFile(const std::vector<unsigned>& encoded) {
+void writeFile(const std::vector<symbol>& encoded) {
     std::ofstream output("out.lzw", std::ofstream::binary);
 
     // Pad the bit string to make its length a multiple of 8
@@ -53,6 +55,12 @@ void writeFile(const std::vector<unsigned>& encoded) {
 
 static std::vector<char> readFile(char const *path) {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file" << std::endl;
+        return std::vector<char>();
+    }
+
     std::ifstream::pos_type pos = file.tellg();
 
     std::vector<char> result(pos);
@@ -63,11 +71,20 @@ static std::vector<char> readFile(char const *path) {
     return result;
 }
 
-std::vector<unsigned> encode(const std::string &original, unsigned maxDictSize) {
+std::string toBinaryString(const std::vector<char>& bin){
+    std::string binaryString;
+
+    for (const char byte : bin)
+        binaryString += std::bitset<8>(byte).to_string();
+
+    return binaryString;
+}
+
+std::vector<symbol> encode(const std::string &original, unsigned maxDictSize) {
     unsigned dictSize = 256;
     std::unordered_map<std::string, unsigned> dictionary;
     std::string w;
-    std::vector<unsigned> result;
+    std::vector<symbol> result;
 
     // Filling the dict with each byte value
     for (unsigned i = 0; i < 256; i++)
@@ -81,7 +98,7 @@ std::vector<unsigned> encode(const std::string &original, unsigned maxDictSize) 
         if (dictionary.count(wc))
             w = wc;
         else {  // If not, inserts it in the result
-            result.push_back(dictionary[w]);
+            result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize)});
             if(dictionary.size() <= maxDictSize)
                 dictionary[wc] = dictSize++;
             w = c;
@@ -89,29 +106,37 @@ std::vector<unsigned> encode(const std::string &original, unsigned maxDictSize) 
     }
 
     if (!w.empty())
-        result.push_back(dictionary[w]);
+        result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize)});
 
     return result;
 }
 
-std::string decode(const std::vector<int> &compressed, int maxDictSize) {
-    int dictSize = 256;
-    std::unordered_map<int, std::string> dictionary;
-    for (int i = 0; i < 256; i++)
+std::string decode(const std::string &compressed, int maxDictSize) {
+    // const std::vector<int> &compressed;
+    unsigned dictSize = 256;
+    std::unordered_map<unsigned, std::string> dictionary;
+    for (unsigned i = 0; i < 256; i++)
         dictionary[i] = std::string(1, i);
 
-    std::string w(1, compressed[0]);
+    unsigned currentSymbol =  std::bitset<32>(compressed.substr(0, 7)).to_ulong();
+    std::string w(1, currentSymbol);
     std::string result = w;
+    unsigned numberOfBits;
     std::string entry;
     
-    for (int i = 1; i < compressed.size(); i++) {
-        int k = compressed[i];
-        if (dictionary.count(k))
-            entry = dictionary[k];
-        else if (k == dictSize)
+    for (unsigned i = 8; i < compressed.size(); i += numberOfBits) {
+        numberOfBits = getMinimumNumberOfBits(dictSize);
+        currentSymbol = std::bitset<32>(compressed.substr(i, numberOfBits)).to_ulong();
+
+        std::cout << compressed.substr(i, numberOfBits) << "\n";
+        std::cout << currentSymbol << "\t("<< numberOfBits << ")\n";  
+
+        if (dictionary.count(currentSymbol))
+            entry = dictionary[currentSymbol];
+        else if (currentSymbol == dictSize)
             entry = w + w[0];
         else
-            throw std::runtime_error("Bad compressed k");
+            throw std::runtime_error("Badly compressed symbol");
 
         result += entry;
 
@@ -135,14 +160,18 @@ int main(int argc, char *argv[]) {
 
     if(!strcmp(argv[1], "-c")){
         printf("Compressing file with a %db dict at path: %s\n", dict_max_size, argv[3]);
-        std::vector<unsigned> compressed = encode(file_content_str, dict_max_size);
+        std::vector<symbol> compressed = encode(file_content_str, dict_max_size);
         writeFile(compressed);
         return 0;
     }
 
-    // if(!strcmp(argv[1], "-d")){
-    //     printf("Decompressing file at path: %s\n", argv[3]);
-    //     std::vector<int> decompressed = encode(file_content_str, dict_max_size);
-    //     return 0;
-    // }   
+    if(!strcmp(argv[1], "-d")){
+        printf("Decompressing file at path: %s\n", argv[3]);
+        std::cout << file_content_str << "\n";
+        std::cout << toBinaryString(file_content) << "\n";
+        std::string decompressed = decode(toBinaryString(file_content), dict_max_size);
+        std::cout << decompressed << "\n";
+
+        return 0;
+    }   
 }
