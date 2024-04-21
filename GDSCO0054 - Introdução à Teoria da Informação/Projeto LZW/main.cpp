@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 struct symbol {
-    unsigned value;
+    size_t value;
     unsigned numberOfBits;
 };
 
@@ -89,9 +89,9 @@ std::string toBinaryString(const std::vector<char>& bin){
     return binaryString;
 }
 
-std::vector<symbol> encode(const std::string &original, unsigned long long maxDictSize) {
-    unsigned dictSize = 256;
-    std::unordered_map<std::string, unsigned> dictionary;
+std::vector<symbol> encode(const std::string &original, size_t maxDictSize) {
+    size_t dictSize = 256;
+    std::unordered_map<std::string, size_t> dictionary;
     std::string w;
     std::vector<symbol> result;
 
@@ -120,19 +120,19 @@ std::vector<symbol> encode(const std::string &original, unsigned long long maxDi
     return result;
 }
 
-std::string decode(const std::string &compressed, unsigned long long maxDictSize) {
-    unsigned dictSize = 256;
-    std::unordered_map<unsigned, std::string> dictionary;
+std::string decode(const std::string &compressed, size_t maxDictSize) {
+    size_t dictSize = 256;
+    std::unordered_map<size_t, std::string> dictionary;
     for (unsigned i = 0; i < 256; i++)
         dictionary[i] = std::string(1, i);
 
-    unsigned currentSymbol =  std::bitset<32>(compressed.substr(0, 8)).to_ulong();
+    size_t currentSymbol =  std::bitset<32>(compressed.substr(0, 8)).to_ulong();
     std::string w(1, currentSymbol); //Decoding the first symbol directly
     std::string result = w;
     unsigned numberOfBits;
     std::string entry;
     
-    for (unsigned i = 8; i < compressed.size(); i += numberOfBits) {
+    for (size_t i = 8; i < compressed.size(); i += numberOfBits) {
         numberOfBits = getMinimumNumberOfBits(dictSize, false);
         currentSymbol = std::bitset<32>(compressed.substr(i, numberOfBits)).to_ulong();
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    unsigned long long dict_max_size = 1 << std::atoi(argv[2]);
+    size_t dict_max_size = 1 << std::atoi(argv[2]);
     std::vector<char> file_content = readFile(argv[3]);
     std::string file_content_str(file_content.begin(), file_content.end());
 
