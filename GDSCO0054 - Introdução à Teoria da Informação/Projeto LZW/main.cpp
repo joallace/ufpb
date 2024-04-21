@@ -13,6 +13,8 @@ struct symbol {
 };
 
 
+//------====== Auxiliary Functions ======------
+
 unsigned getMinimumNumberOfBits(unsigned number, bool decrement) {
     unsigned n = number-decrement;
     unsigned result = 0;
@@ -31,6 +33,18 @@ std::string concatenateBinary(const std::vector<symbol>& symbols) {
         result += std::bitset<32>(s.value).to_string().substr(32 - s.numberOfBits, s.numberOfBits);
     return result;
 }
+
+std::string toBinaryString(const std::vector<char>& bin){
+    std::string binaryString;
+
+    for (const char byte : bin)
+        binaryString += std::bitset<8>(byte).to_string();
+
+    return binaryString;
+}
+
+
+//------====== Read/write Functions ======------
 
 void writeEncodedFile(const std::vector<symbol>& encoded) {
     std::ofstream output("encoded.lzw", std::ofstream::binary);
@@ -80,16 +94,45 @@ static std::vector<char> readFile(char const *path) {
     return result;
 }
 
-std::string toBinaryString(const std::vector<char>& bin){
-    std::string binaryString;
 
-    for (const char byte : bin)
-        binaryString += std::bitset<8>(byte).to_string();
+//------====== Strategy Functions ======------
 
-    return binaryString;
+void keepStatic(std::unordered_map<std::string, size_t>& dict) {
+    return;
 }
 
-std::vector<symbol> encode(const std::string &original, size_t maxDictSize) {
+void keepStatic(std::unordered_map<size_t, std::string>& dict) {
+    return;
+}
+
+
+void reset(std::unordered_map<std::string, size_t>& dict) {
+    dict.clear();
+
+    for (unsigned i = 0; i < 256; i++)
+        dict[std::string(1, i)] = i;
+}
+
+void reset(std::unordered_map<size_t, std::string>& dict) {
+    dict.clear();
+
+    for (unsigned i = 0; i < 256; i++)
+        dict[i] = std::string(1, i);
+}
+
+
+void resetIfUnderperforming(std::unordered_map<std::string, size_t>& dict) {
+    dict.clear();
+}
+
+void resetIfUnderperforming(std::unordered_map<size_t, std::string>& dict) {
+    dict.clear();
+}
+
+
+//------====== Encoding/Decoding Functions ======------
+
+std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void (*strategy)(std::unordered_map<std::string, size_t>&)) {
     size_t dictSize = 256;
     std::unordered_map<std::string, size_t> dictionary;
     std::string w;
@@ -110,6 +153,8 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize) {
             result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
             if(dictionary.size() <= maxDictSize)
                 dictionary[wc] = dictSize++;
+            else
+                strategy(dictionary);
             w = c;
         }
     }
@@ -120,7 +165,7 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize) {
     return result;
 }
 
-std::string decode(const std::string &compressed, size_t maxDictSize) {
+std::string decode(const std::string &compressed, size_t maxDictSize, void (*strategy)(std::unordered_map<size_t, std::string>&)) {
     size_t dictSize = 256;
     std::unordered_map<size_t, std::string> dictionary;
     for (unsigned i = 0; i < 256; i++)
@@ -142,7 +187,7 @@ std::string decode(const std::string &compressed, size_t maxDictSize) {
             entry = w + w[0];
         else{
             char errorStr[256];
-            sprintf(errorStr, "Badly compressed symbol \"%d\" (dictSize = %d)\n", currentSymbol, dictSize);
+            sprintf(errorStr, "Badly compressed symbol \"%ld\" (dictSize = %ld)\n", currentSymbol, dictSize);
             throw std::runtime_error(errorStr);
         }
         
@@ -150,12 +195,17 @@ std::string decode(const std::string &compressed, size_t maxDictSize) {
 
         if(dictionary.size() <= maxDictSize)
             dictionary[dictSize++] = w + entry[0];
+        else
+            strategy(dictionary);
 
         w = entry;
     }
 
     return result;
 }
+
+
+//------====== Main ======------
 
 int main(int argc, char *argv[]) {
     if(argc < 4){
@@ -175,15 +225,15 @@ int main(int argc, char *argv[]) {
     std::string file_content_str(file_content.begin(), file_content.end());
 
     if(!strcmp(argv[1], "-c")){
-        printf("Compressing file with a %lldb dict at path: %s\n", dict_max_size, argv[3]);
-        std::vector<symbol> compressed = encode(file_content_str, dict_max_size);
+        printf("Compressing file with a %ldb dict at path: %s\n", dict_max_size, argv[3]);
+        std::vector<symbol> compressed = encode(file_content_str, dict_max_size, &reset);
         writeEncodedFile(compressed);
         return 0;
     }
 
     if(!strcmp(argv[1], "-d")){
-        printf("Decompressing file with a %lldb dict at path: %s\n", dict_max_size, argv[3]);
-        std::string decompressed = decode(toBinaryString(file_content), dict_max_size);
+        printf("Decompressing file with a %ldb dict at path: %s\n", dict_max_size, argv[3]);
+        std::string decompressed = decode(toBinaryString(file_content), dict_max_size, &reset);
         writeDecodedFile(decompressed);
         return 0;
     }   
