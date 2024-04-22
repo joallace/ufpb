@@ -12,10 +12,6 @@ struct symbol {
     unsigned numberOfBits;
 };
 
-struct analytics{
-    double compressionRatio;
-};
-
 
 //------====== Auxiliary Functions ======------
 
@@ -33,7 +29,7 @@ unsigned getMinimumNumberOfBits(unsigned number, bool decrement) {
 
 double getBitsPerSymbol(const std::vector<symbol>& symbols){
     size_t bits = 0;
-    for (symbol s : symbols)
+    for (const symbol s : symbols)
         bits += s.numberOfBits;
     return (double)bits/symbols.size();    
 }
@@ -108,58 +104,60 @@ static std::vector<char> readFile(char const *path) {
 
 //------====== Strategy Functions ======------
 
-void keepStatic(std::unordered_map<std::string, size_t>& dict) {
+void keepStatic(size_t& dictSize, std::unordered_map<std::string, size_t>& dict, std::vector<double>& compressionRatios) {
     return;
 }
 
-void keepStatic(std::unordered_map<size_t, std::string>& dict) {
+void keepStatic(size_t& dictSize, std::unordered_map<size_t, std::string>& dict, std::vector<double>& compressionRatios) {
     return;
 }
 
 
-void reset(std::unordered_map<std::string, size_t>& dict) {
+void reset(size_t& dictSize, std::unordered_map<std::string, size_t>& dict, std::vector<double>& compressionRatios) {
     dict.clear();
 
+    dictSize = 256;
     for (unsigned i = 0; i < 256; i++)
         dict[std::string(1, i)] = i;
 }
 
-void reset(std::unordered_map<size_t, std::string>& dict) {
+void reset(size_t& dictSize, std::unordered_map<size_t, std::string>& dict, std::vector<double>& compressionRatios) {
     dict.clear();
 
+    dictSize = 256;
     for (unsigned i = 0; i < 256; i++)
         dict[i] = std::string(1, i);
 }
 
 
-void resetIfUnderperforming(std::unordered_map<std::string, size_t>& dict, std::vector<analytics>& data) {
+void resetIfUnderperforming(size_t& dictSize, std::unordered_map<std::string, size_t>& dict, std::vector<double>& compressionRatios) {
     double compressionRatioMean = 0;
-    size_t dataSize = data.size();
+    size_t dataSize = compressionRatios.size();
     size_t windowSize = dataSize < 400 ? dataSize/4 : 100;
 
-    for(size_t i = dataSize-windowSize; i < dataSize; i++)
-        compressionRatioMean += data[i].compressionRatio;
+    for(size_t i = dataSize-windowSize-1; i < dataSize-1; i++)
+        compressionRatioMean += compressionRatios[i];
 
-    if(compressionRatioMean/windowSize < -1.0)
-        reset(dict);
+    if(compressionRatioMean/windowSize - compressionRatios[dataSize-1] < -1.0)
+        reset(dictSize, dict, compressionRatios);
 }
 
-void resetIfUnderperforming(std::unordered_map<size_t, std::string>& dict, std::vector<analytics>& data) {
+void resetIfUnderperforming(size_t& dictSize, std::unordered_map<size_t, std::string>& dict, std::vector<double>& compressionRatios) {
     double compressionRatioMean = 0;
-    size_t dataSize = data.size();
+    size_t dataSize = compressionRatios.size();
     size_t windowSize = dataSize < 400 ? dataSize/4 : 100;
 
-    for(size_t i = dataSize-windowSize; i < dataSize; i++)
-        compressionRatioMean += data[i].compressionRatio;
+    for(size_t i = dataSize-windowSize-1; i < dataSize-1; i++)
+        compressionRatioMean += compressionRatios[i];
 
-    if(compressionRatioMean/windowSize < -1.0)
-        reset(dict);
+    if(compressionRatioMean/windowSize - compressionRatios[dataSize-1] < -1.0)
+        reset(dictSize, dict, compressionRatios);
 }
 
 
 //------====== Encoding/Decoding Functions ======------
 
-std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void (*strategy)(std::unordered_map<std::string, size_t>&)) {
+std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void (*strategy)(size_t&, std::unordered_map<std::string, size_t>&, std::vector<double>&)) {
     size_t dictSize = 256;
     std::unordered_map<std::string, size_t> dictionary;
     std::string w;
@@ -171,21 +169,23 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
         dictionary[std::string(1, i)] = i;
 
 
-    for (const char c : original) {
-        std::string wc = w + c;
+    for (size_t i = 0; i < original.size(); i++) {
+        std::string wc = w + original[i];
 
         // Checking if the current sequence is in the dict
         if (dictionary.count(wc))
             w = wc;
         else {  // If not, inserts it in the result
             result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
-            compressionRatio.push_back(getBitsPerSymbol(result));
+
+            if(!(result.size()%256))
+                compressionRatio.push_back(getBitsPerSymbol(result));
 
             if(dictionary.size() <= maxDictSize)
                 dictionary[wc] = dictSize++;
             else
-                strategy(dictionary);
-            w = c;
+                strategy(dictSize, dictionary, compressionRatio);
+            w = original[i];
         }
     }
 
@@ -195,7 +195,7 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
     return result;
 }
 
-std::string decode(const std::string &compressed, size_t maxDictSize, void (*strategy)(std::unordered_map<size_t, std::string>&)) {
+std::string decode(const std::string &compressed, size_t maxDictSize, void (*strategy)(size_t&, std::unordered_map<size_t, std::string>&, std::vector<double>&)) {
     size_t dictSize = 256;
     std::unordered_map<size_t, std::string> dictionary;
     for (unsigned i = 0; i < 256; i++)
@@ -204,12 +204,15 @@ std::string decode(const std::string &compressed, size_t maxDictSize, void (*str
     size_t currentSymbol =  std::bitset<32>(compressed.substr(0, 8)).to_ulong();
     std::string w(1, currentSymbol); //Decoding the first symbol directly
     std::string result = w;
+    std::vector<symbol> symbols = {{currentSymbol, 8}};
+    std::vector<double> compressionRatio;
     unsigned numberOfBits;
     std::string entry;
     
     for (size_t i = 8; i < compressed.size(); i += numberOfBits) {
         numberOfBits = getMinimumNumberOfBits(dictSize, false);
         currentSymbol = std::bitset<32>(compressed.substr(i, numberOfBits)).to_ulong();
+        symbols.push_back({currentSymbol, numberOfBits});
 
         if (dictionary.count(currentSymbol))
             entry = dictionary[currentSymbol];
@@ -222,11 +225,14 @@ std::string decode(const std::string &compressed, size_t maxDictSize, void (*str
         }
         
         result += entry;
+        
+        if(!(symbols.size()%256))
+            compressionRatio.push_back(getBitsPerSymbol(symbols));
 
         if(dictionary.size() <= maxDictSize)
             dictionary[dictSize++] = w + entry[0];
         else
-            strategy(dictionary);
+            strategy(dictSize, dictionary, compressionRatio);
 
         w = entry;
     }
