@@ -7,6 +7,14 @@
 #include <bitset>
 #include <unordered_map>
 
+struct arguments {
+    size_t maxDictSize = 4096;
+    char operation = 'c';
+    std::string outputPath;
+    std::string inputPath;
+    bool collectAnalysis = false;
+};
+
 struct symbol {
     size_t value;
     unsigned numberOfBits;
@@ -53,8 +61,8 @@ std::string toBinaryString(const std::vector<char>& bin){
 
 //------====== Read/write Functions ======------
 
-void writeEncodedFile(const std::vector<symbol>& encoded) {
-    std::ofstream output("encoded.lzw", std::ofstream::binary);
+void writeEncodedFile(std::string path, const std::vector<symbol>& encoded) {
+    std::ofstream output(path, std::ofstream::binary);
 
     // Pad the bit string to make its length a multiple of 8
     std::string paddedBitString = concatenateBinary(encoded);
@@ -74,8 +82,8 @@ void writeEncodedFile(const std::vector<symbol>& encoded) {
     output.close();
 }
 
-void writeDecodedFile(const std::string& decoded) {
-    std::ofstream output("decoded", std::ofstream::binary);
+void writeDecodedFile(std::string path, const std::string& decoded) {
+    std::ofstream output(path, std::ofstream::binary);
 
     // We won't write the last byte as it is an EOF signal.
     output.write(decoded.c_str(), decoded.size()-1);
@@ -83,12 +91,12 @@ void writeDecodedFile(const std::string& decoded) {
     output.close();
 }
 
-static std::vector<char> readFile(char const *path) {
+static std::vector<char> readFile(std::string path) {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
 
     if (!file.is_open()) {
-        std::cerr << "Error opening file" << std::endl;
-        return std::vector<char>();
+        std::cerr << "\nERROR: Could not open the file at the provided path." << std::endl;
+        exit(1);
     }
 
     std::ifstream::pos_type pos = file.tellg();
@@ -138,8 +146,10 @@ void resetIfUnderperforming(size_t& dictSize, std::unordered_map<std::string, si
     for(size_t i = dataSize-windowSize-1; i < dataSize-1; i++)
         compressionRatioMean += compressionRatios[i];
 
-    if(compressionRatioMean/windowSize - compressionRatios[dataSize-1] < -1.0)
+    if((compressionRatioMean/windowSize - compressionRatios[dataSize-1]) < -0.5){
+        printf("Dicionário resetado\n");
         reset(dictSize, dict, compressionRatios);
+    }
 }
 
 void resetIfUnderperforming(size_t& dictSize, std::unordered_map<size_t, std::string>& dict, std::vector<double>& compressionRatios) {
@@ -150,8 +160,10 @@ void resetIfUnderperforming(size_t& dictSize, std::unordered_map<size_t, std::st
     for(size_t i = dataSize-windowSize-1; i < dataSize-1; i++)
         compressionRatioMean += compressionRatios[i];
 
-    if(compressionRatioMean/windowSize - compressionRatios[dataSize-1] < -1.0)
+    if((compressionRatioMean/windowSize - compressionRatios[dataSize-1]) < -0.5){
+        printf("Dicionário resetado\n");
         reset(dictSize, dict, compressionRatios);
+    }
 }
 
 
@@ -243,34 +255,69 @@ std::string decode(const std::string &compressed, size_t maxDictSize, void (*str
 
 //------====== Main ======------
 
+arguments argParse(int argc, char** argv){
+    arguments args;
+
+    if (argc < 2) {
+        std::cerr << "\nERROR: Missing parameters! Usage:\n"
+                  << " ./lzw file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
+        exit(1);
+    }
+
+    if (argc > 5) {
+        std::cerr << "\nERROR: Too many parameters!\n"
+                  << " ./lzw file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
+        exit(1);
+    }
+
+    args.inputPath = argv[1];
+
+    for(int i = 2; i < argc; i++){
+        if(!strcmp(argv[i], "-o"))
+            args.outputPath = argv[i+1];
+
+        if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "-d")){
+            size_t dictPow = std::atoi(argv[i+1]);
+
+            if(dictPow >= 32 || dictPow < 8){
+                std::cerr << "\nERROR: Invalid dict size! min: 8; max: 31\n";
+                exit(1);
+            }
+
+            args.operation = argv[i][1];
+            args.maxDictSize = 1 << dictPow;
+        }
+
+        if(!strcmp(argv[i], "-b"))
+            args.collectAnalysis = true;
+    }
+
+    if(args.outputPath.empty())
+        if(args.operation == 'c')
+            args.outputPath = "encoded.lzw";
+        else
+            args.outputPath = "decoded";
+
+    return args;
+}
+
 int main(int argc, char *argv[]) {
-    if(argc < 4){
-        printf("Missing parameters! Usage:\n./lzw -[c or d] [number of n for 2^n bits for the dict] [file path]\n");
-        return 1;
-    }
+    arguments args = argParse(argc, argv);
 
-    int dictPow = std::atoi(argv[2]);
+    std::vector<char> fileContent = readFile(args.inputPath);
+    std::string fileContentStr(fileContent.begin(), fileContent.end());
 
-    if(dictPow >= 32 || dictPow < 8){
-        printf("Invalid dict size! min: 8; max: 31");
-        return 1;
-    }
-
-    size_t dict_max_size = 1 << std::atoi(argv[2]);
-    std::vector<char> file_content = readFile(argv[3]);
-    std::string file_content_str(file_content.begin(), file_content.end());
-
-    if(!strcmp(argv[1], "-c")){
-        printf("Compressing file with a %ldb dict at path: %s\n", dict_max_size, argv[3]);
-        std::vector<symbol> compressed = encode(file_content_str, dict_max_size, &reset);
-        writeEncodedFile(compressed);
+    if(args.operation == 'c'){
+        printf("Compressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, argv[3]);
+        std::vector<symbol> compressed = encode(fileContentStr, args.maxDictSize, &resetIfUnderperforming);
+        writeEncodedFile(args.outputPath, compressed);
         return 0;
     }
 
-    if(!strcmp(argv[1], "-d")){
-        printf("Decompressing file with a %ldb dict at path: %s\n", dict_max_size, argv[3]);
-        std::string decompressed = decode(toBinaryString(file_content), dict_max_size, &reset);
-        writeDecodedFile(decompressed);
+    if(args.operation == 'd'){
+        printf("Decompressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, argv[3]);
+        std::string decompressed = decode(toBinaryString(fileContent), args.maxDictSize, &resetIfUnderperforming);
+        writeDecodedFile(args.outputPath, decompressed);
         return 0;
     }   
 }
