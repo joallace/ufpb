@@ -12,6 +12,10 @@ struct symbol {
     unsigned numberOfBits;
 };
 
+struct analytics{
+    double compressionRatio;
+};
+
 
 //------====== Auxiliary Functions ======------
 
@@ -25,6 +29,13 @@ unsigned getMinimumNumberOfBits(unsigned number, bool decrement) {
     }
 
     return result < 8 ? 8 : result;
+}
+
+double getBitsPerSymbol(const std::vector<symbol>& symbols){
+    size_t bits = 0;
+    for (symbol s : symbols)
+        bits += s.numberOfBits;
+    return (double)bits/symbols.size();    
 }
 
 std::string concatenateBinary(const std::vector<symbol>& symbols) {
@@ -121,12 +132,28 @@ void reset(std::unordered_map<size_t, std::string>& dict) {
 }
 
 
-void resetIfUnderperforming(std::unordered_map<std::string, size_t>& dict) {
-    dict.clear();
+void resetIfUnderperforming(std::unordered_map<std::string, size_t>& dict, std::vector<analytics>& data) {
+    double compressionRatioMean = 0;
+    size_t dataSize = data.size();
+    size_t windowSize = dataSize < 400 ? dataSize/4 : 100;
+
+    for(size_t i = dataSize-windowSize; i < dataSize; i++)
+        compressionRatioMean += data[i].compressionRatio;
+
+    if(compressionRatioMean/windowSize < -1.0)
+        reset(dict);
 }
 
-void resetIfUnderperforming(std::unordered_map<size_t, std::string>& dict) {
-    dict.clear();
+void resetIfUnderperforming(std::unordered_map<size_t, std::string>& dict, std::vector<analytics>& data) {
+    double compressionRatioMean = 0;
+    size_t dataSize = data.size();
+    size_t windowSize = dataSize < 400 ? dataSize/4 : 100;
+
+    for(size_t i = dataSize-windowSize; i < dataSize; i++)
+        compressionRatioMean += data[i].compressionRatio;
+
+    if(compressionRatioMean/windowSize < -1.0)
+        reset(dict);
 }
 
 
@@ -137,6 +164,7 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
     std::unordered_map<std::string, size_t> dictionary;
     std::string w;
     std::vector<symbol> result;
+    std::vector<double> compressionRatio;
 
     // Filling the dict with each byte value
     for (unsigned i = 0; i < 256; i++)
@@ -151,6 +179,8 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
             w = wc;
         else {  // If not, inserts it in the result
             result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
+            compressionRatio.push_back(getBitsPerSymbol(result));
+
             if(dictionary.size() <= maxDictSize)
                 dictionary[wc] = dictSize++;
             else
@@ -215,8 +245,8 @@ int main(int argc, char *argv[]) {
 
     int dictPow = std::atoi(argv[2]);
 
-    if(dictPow >= 32 || dictPow < 1){
-        printf("Invalid dict size! Max: 31");
+    if(dictPow >= 32 || dictPow < 8){
+        printf("Invalid dict size! min: 8; max: 31");
         return 1;
     }
 
