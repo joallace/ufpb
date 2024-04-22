@@ -192,7 +192,7 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
         else {  // If not, inserts it in the result
             result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
 
-            if(!(result.size()%256))
+            if(args.collectAnalysis && !(result.size()%256))
                 compressionRatio.push_back(getBitsPerSymbol(result));
 
             if(dictionary.size() <= args.maxDictSize)
@@ -241,7 +241,7 @@ std::string decode(const std::string &compressed, arguments &args) {
         
         result += entry;
         
-        if(!(symbols.size()%256))
+        if(args.collectAnalysis && !(symbols.size()%256))
             compressionRatio.push_back(getBitsPerSymbol(symbols));
 
         if(dictionary.size() <= args.maxDictSize)
@@ -287,11 +287,13 @@ arguments argParse(int argc, char** argv){
         }
 
         if(!strcmp(argv[i], "-s")){
-            args.strategyId = std::atoi(argv[i+1]);
-            if(args.strategyId > 3 || args.strategyId < 1){
+            args.strategyId = std::atoi(argv[i+1])-1;
+            if(args.strategyId > 2 || args.strategyId < 0){
                 std::cerr << "\nERROR: Invalid strategy id! min: 1; max: 3\n";
                 exit(1);
             }
+            if(args.strategyId == 2)
+                args.collectAnalysis = true;
         }
 
         if(!strcmp(argv[i], "-b"))
