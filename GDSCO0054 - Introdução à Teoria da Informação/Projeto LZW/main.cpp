@@ -10,6 +10,7 @@
 struct arguments {
     size_t maxDictSize = 4096;
     char operation = 'c';
+    char strategyId = 2;
     std::string outputPath;
     std::string inputPath;
     bool collectAnalysis = false;
@@ -169,12 +170,13 @@ void resetIfUnderperforming(size_t& dictSize, std::unordered_map<size_t, std::st
 
 //------====== Encoding/Decoding Functions ======------
 
-std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void (*strategy)(size_t&, std::unordered_map<std::string, size_t>&, std::vector<double>&)) {
+std::vector<symbol> encode(const std::string &original, arguments &args) {
     size_t dictSize = 256;
     std::unordered_map<std::string, size_t> dictionary;
     std::string w;
     std::vector<symbol> result;
     std::vector<double> compressionRatio;
+    void (*strategies[3])(size_t&, std::unordered_map<std::string, size_t>&, std::vector<double>&) = {&keepStatic, &reset, &resetIfUnderperforming};
 
     // Filling the dict with each byte value
     for (unsigned i = 0; i < 256; i++)
@@ -193,10 +195,10 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
             if(!(result.size()%256))
                 compressionRatio.push_back(getBitsPerSymbol(result));
 
-            if(dictionary.size() <= maxDictSize)
+            if(dictionary.size() <= args.maxDictSize)
                 dictionary[wc] = dictSize++;
             else
-                strategy(dictSize, dictionary, compressionRatio);
+                strategies[args.strategyId](dictSize, dictionary, compressionRatio);
             w = original[i];
         }
     }
@@ -207,7 +209,7 @@ std::vector<symbol> encode(const std::string &original, size_t maxDictSize, void
     return result;
 }
 
-std::string decode(const std::string &compressed, size_t maxDictSize, void (*strategy)(size_t&, std::unordered_map<size_t, std::string>&, std::vector<double>&)) {
+std::string decode(const std::string &compressed, arguments &args) {
     size_t dictSize = 256;
     std::unordered_map<size_t, std::string> dictionary;
     for (unsigned i = 0; i < 256; i++)
@@ -220,6 +222,7 @@ std::string decode(const std::string &compressed, size_t maxDictSize, void (*str
     std::vector<double> compressionRatio;
     unsigned numberOfBits;
     std::string entry;
+    void (*strategies[3])(size_t&, std::unordered_map<size_t, std::string>&, std::vector<double>&) = {&keepStatic, &reset, &resetIfUnderperforming};
     
     for (size_t i = 8; i < compressed.size(); i += numberOfBits) {
         numberOfBits = getMinimumNumberOfBits(dictSize, false);
@@ -241,10 +244,10 @@ std::string decode(const std::string &compressed, size_t maxDictSize, void (*str
         if(!(symbols.size()%256))
             compressionRatio.push_back(getBitsPerSymbol(symbols));
 
-        if(dictionary.size() <= maxDictSize)
+        if(dictionary.size() <= args.maxDictSize)
             dictionary[dictSize++] = w + entry[0];
         else
-            strategy(dictSize, dictionary, compressionRatio);
+            strategies[args.strategyId](dictSize, dictionary, compressionRatio);
 
         w = entry;
     }
@@ -264,12 +267,7 @@ arguments argParse(int argc, char** argv){
         exit(1);
     }
 
-    if (argc > 5) {
-        std::cerr << "\nERROR: Too many parameters!\n"
-                  << " ./lzw file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
-        exit(1);
-    }
-
+    // First argument will always be the input file  path
     args.inputPath = argv[1];
 
     for(int i = 2; i < argc; i++){
@@ -286,6 +284,14 @@ arguments argParse(int argc, char** argv){
 
             args.operation = argv[i][1];
             args.maxDictSize = 1 << dictPow;
+        }
+
+        if(!strcmp(argv[i], "-s")){
+            args.strategyId = std::atoi(argv[i+1]);
+            if(args.strategyId > 3 || args.strategyId < 1){
+                std::cerr << "\nERROR: Invalid strategy id! min: 1; max: 3\n";
+                exit(1);
+            }
         }
 
         if(!strcmp(argv[i], "-b"))
@@ -308,15 +314,15 @@ int main(int argc, char *argv[]) {
     std::string fileContentStr(fileContent.begin(), fileContent.end());
 
     if(args.operation == 'c'){
-        printf("Compressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, argv[3]);
-        std::vector<symbol> compressed = encode(fileContentStr, args.maxDictSize, &resetIfUnderperforming);
+        printf("Compressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, args.inputPath.c_str());
+        std::vector<symbol> compressed = encode(fileContentStr, args);
         writeEncodedFile(args.outputPath, compressed);
         return 0;
     }
 
     if(args.operation == 'd'){
-        printf("Decompressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, argv[3]);
-        std::string decompressed = decode(toBinaryString(fileContent), args.maxDictSize, &resetIfUnderperforming);
+        printf("Decompressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, args.inputPath.c_str());
+        std::string decompressed = decode(toBinaryString(fileContent), args);
         writeDecodedFile(args.outputPath, decompressed);
         return 0;
     }   
