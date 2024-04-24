@@ -10,10 +10,11 @@
 struct arguments {
     size_t maxDictSize = 4096;
     char operation = 'c';
-    char strategyId = 2;
+    char strategyId = 1;
     std::string outputPath;
     std::string inputPath;
     bool collectAnalysis = false;
+    bool writeAnalysis = false;
 };
 
 struct symbol {
@@ -36,11 +37,11 @@ unsigned getMinimumNumberOfBits(unsigned number, bool decrement) {
     return result < 8 ? 8 : result;
 }
 
-double getBitsPerSymbol(const std::vector<symbol>& symbols){
+double getBitsPerSymbol(const std::vector<symbol>& symbols, size_t n_symbols){
     size_t bits = 0;
     for (const symbol s : symbols)
         bits += s.numberOfBits;
-    return (double)bits/symbols.size();    
+    return (double)bits/n_symbols;
 }
 
 std::string concatenateBinary(const std::vector<symbol>& symbols) {
@@ -125,7 +126,7 @@ void keepStatic(size_t& dictSize, std::unordered_map<size_t, std::string>& dict,
 void reset(size_t& dictSize, std::unordered_map<std::string, size_t>& dict, std::vector<double>& compressionRatios) {
     dict.clear();
 
-    dictSize = 256;
+    // dictSize = 256;
     for (unsigned i = 0; i < 256; i++)
         dict[std::string(1, i)] = i;
 }
@@ -133,7 +134,7 @@ void reset(size_t& dictSize, std::unordered_map<std::string, size_t>& dict, std:
 void reset(size_t& dictSize, std::unordered_map<size_t, std::string>& dict, std::vector<double>& compressionRatios) {
     dict.clear();
 
-    dictSize = 256;
+    // dictSize = 256;
     for (unsigned i = 0; i < 256; i++)
         dict[i] = std::string(1, i);
 }
@@ -193,7 +194,7 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
             result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
 
             if(args.collectAnalysis && !(result.size()%256))
-                compressionRatio.push_back(getBitsPerSymbol(result));
+                compressionRatio.push_back(getBitsPerSymbol(result, i));
 
             if(dictionary.size() <= args.maxDictSize)
                 dictionary[wc] = dictSize++;
@@ -205,6 +206,20 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
 
     if (!w.empty())
         result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
+
+    if(args.writeAnalysis){
+        std::ofstream output("benchmark.json");
+
+        output<<"[";
+        for(size_t i = 0; i < compressionRatio.size(); i++)
+            output << compressionRatio[i] << ( i+1 == compressionRatio.size() ? "" : ",");
+        // We won't write the last byte as it is an EOF signal.
+        output<<"]";
+
+        output.close();
+    }
+
+    printf("Average length: %fb/symbol\n", getBitsPerSymbol(result, original.size()));
 
     return result;
 }
@@ -242,7 +257,7 @@ std::string decode(const std::string &compressed, arguments &args) {
         result += entry;
         
         if(args.collectAnalysis && !(symbols.size()%256))
-            compressionRatio.push_back(getBitsPerSymbol(symbols));
+            compressionRatio.push_back(getBitsPerSymbol(symbols,  symbols.size()));
 
         if(dictionary.size() <= args.maxDictSize)
             dictionary[dictSize++] = w + entry[0];
@@ -251,6 +266,7 @@ std::string decode(const std::string &compressed, arguments &args) {
 
         w = entry;
     }
+
 
     return result;
 }
@@ -263,7 +279,7 @@ arguments argParse(int argc, char** argv){
 
     if (argc < 2) {
         std::cerr << "\nERROR: Missing parameters! Usage:\n"
-                  << " ./lzw file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
+                  << " " << argv[0] << " file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
         exit(1);
     }
 
@@ -296,8 +312,10 @@ arguments argParse(int argc, char** argv){
                 args.collectAnalysis = true;
         }
 
-        if(!strcmp(argv[i], "-b"))
+        if(!strcmp(argv[i], "-b")){
             args.collectAnalysis = true;
+            args.writeAnalysis = true;
+        }
     }
 
     if(args.outputPath.empty())
