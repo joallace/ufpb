@@ -1,0 +1,35 @@
+{
+    "MPB": [
+        "/jorge-ben-jor/",
+        "/djavan/",
+        "/gilberto-gil/",
+        "/gal-costa/",
+        "/chico-buarque/",
+        "/ze-ramalho/"
+    ],
+    "Forró": [
+        "/luiz-gonzaga/",
+        "/flavio-jose/",
+        "/dominguinhos/",
+        "/sivuca/",
+        "/jackson-do-pandeiro/"
+    ],
+    "Samba": [
+        "/bezerra-da-silva/",
+        "/cartola/",
+        "/vinicius-de-moraes/"
+    ],
+    "Hip-hop": [
+        "/gabriel-pensador/",
+        "/racionais-mcs/",
+        "/sabotage/"
+    ],
+    "Rock": [
+        "/planet-hemp/",
+        "/chico-science-nacao-zumbi/",
+        "/cazuza/",
+        "/o-rappa/",
+        "/renato-russo/",
+        "charlie-brown-jr"
+    ]
+}
