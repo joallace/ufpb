@@ -27,29 +27,27 @@ with open(ARTISTS_PATH, 'r') as file:
 async def get(genre, url, lock, session):
     while(True):
         try:
-            print(f'{VAGALUME_URL}{url}')
+            if url in discographies[genre]:
+                return
+            
             async with session.get(url=f'{VAGALUME_URL}/{url}') as r:
                     soup = BeautifulSoup(await r.text(), "lxml")
 
                     if r.ok:
                         artist = soup.select_one('h1.darkBG > a').text
                         async with lock:
-                            if artist in discographies[genre]:
-                                return
-
-                            discographies[genre][artist] = {
-                                'url': url,
+                            discographies[genre][url] = {
+                                'name': artist,
                                 'discography': []
                             }
 
                             for music in soup.select("ol#alfabetMusicList > li > div > div > a"):
-                                print(music)
                                 music = music['href'][(len(url)+2):-5]
-                                if music and music not in discographies[genre][artist]['discography']:
-                                    discographies[genre][artist]['discography'].append(music)
+                                if music and music not in discographies[genre][url]['discography']:
+                                    discographies[genre][url]['discography'].append(music)
 
-                            if not discographies[genre][artist]['discography']:
-                                del discographies[genre][artist]
+                            if not discographies[genre][url]['discography']:
+                                del discographies[genre][url]
                                 print(f'Could not save artist {artist}...')
                                 return
                             else:
@@ -72,7 +70,8 @@ async def main():
     for genre, artists in genres.items():
 
         print(f'Getting {genre} genre...')
-        discographies[genre] = {}
+        if(genre not in discographies):
+            discographies[genre] = {}
 
         async with aiohttp.ClientSession() as session:
             ret = await asyncio.gather(*[get(genre, clean_name(artist, False), lock, session) for artist in artists])

@@ -33,14 +33,14 @@ async def get(path, artistUrl, music, session):
 async def main():
     for genre, artists in musicList.items():
         print(f'Getting genre {genre}...')
-        for artist, artistData in artists.items():
-            print(f'Getting artist {artist}...')
+        for artistUrl, artistData in artists.items():
+            print(f'Getting artist {artistData["name"]}...')
             
-            path = f'{DATA_PATH}/{genre}/{artist}'
+            path = f'{DATA_PATH}/{genre}/{artistData["name"]}'
             os.makedirs(path, exist_ok = True)
 
             async with aiohttp.ClientSession() as session:
-                ret = await asyncio.gather(*[get(path, artistData["url"], music, session) for music in artistData["discography"]])
+                ret = await asyncio.gather(*[get(path, artistUrl, music, session) for music in artistData["discography"]])
 
             print('Artist done!')
 

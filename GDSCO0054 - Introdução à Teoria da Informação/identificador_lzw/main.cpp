@@ -63,6 +63,15 @@ std::string toBinaryString(const std::vector<char>& bin){
     return binaryString;
 }
 
+std::unordered_map<size_t, std::string> flipDict(const std::unordered_map<std::string, size_t>& dictionary){
+    std::unordered_map<size_t, std::string> flipped;
+
+    for (const auto& pair : dictionary)
+        flipped[pair.second] = pair.first;
+
+    return flipped;
+}
+
 
 //------====== Read/write Functions ======------
 
@@ -179,8 +188,10 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
     std::string w;
     std::vector<symbol> result;
 
-    if(args.readDict)
+    if(args.readDict){
         dictionary = dictFromFile(args.dictPath);
+        dictSize = dictionary.size();
+    }
     else
         for (unsigned i = 0; i < 256; i++) // Filling the dict with each byte value
             dictionary[std::string(1, i)] = i;
@@ -203,7 +214,7 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
         result.push_back({dictionary[w], getMinimumNumberOfBits(dictSize, true)});
 
     if(args.writeDict)
-        dictToFile(dictionary, "dict.bin");
+        dictToFile(dictionary, args.dictPath);
 
     printf("Average length: %fb/symbol\n", getBitsPerSymbol(result, original.size()));
 
@@ -213,10 +224,16 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
 std::string decode(const std::string &compressed, arguments &args) {
     size_t dictSize = 256;
     std::unordered_map<size_t, std::string> dictionary;
-    for (unsigned i = 0; i < 256; i++)
-        dictionary[i] = std::string(1, i);
+    
+    if(args.readDict){
+        dictionary = flipDict(dictFromFile(args.dictPath));
+        dictSize = dictionary.size();
+    }
+    else
+        for (unsigned i = 0; i < 256; i++)
+            dictionary[i] = std::string(1, i);
 
-    size_t currentSymbol =  std::bitset<32>(compressed.substr(0, 8)).to_ulong();
+    size_t currentSymbol =  std::bitset<32>(compressed.substr(0, getMinimumNumberOfBits(dictSize, false))).to_ulong();
     std::string w(1, currentSymbol); //Decoding the first symbol directly
     std::string result = w;
     std::vector<symbol> symbols = {{currentSymbol, 8}};
@@ -272,8 +289,8 @@ arguments argParse(int argc, char** argv){
         if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "-d")){
             size_t dictPow = std::atoi(argv[i+1]);
 
-            if(dictPow >= 32 || dictPow < 8){
-                std::cerr << "\nERROR: Invalid dict size! min: 8; max: 31\n";
+            if(dictPow > 30 || dictPow < 8){
+                std::cerr << "\nERROR: Invalid dict size! min: 8; max: 30\n";
                 exit(1);
             }
 
@@ -282,8 +299,10 @@ arguments argParse(int argc, char** argv){
         }
 
 
-        if(!strcmp(argv[i], "-e"))
+        if(!strcmp(argv[i], "-e")){
+            args.dictPath = argv[i+1];
             args.writeDict = true;
+        }
 
         if(!strcmp(argv[i], "-i")){
             args.dictPath = argv[i+1];
