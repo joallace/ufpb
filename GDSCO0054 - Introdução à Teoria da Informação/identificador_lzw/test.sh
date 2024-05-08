@@ -35,5 +35,5 @@ for model in "${styles[@]}"; do
     done
 done
 
-echo "Training completed."
+echo "Test completed."
 
