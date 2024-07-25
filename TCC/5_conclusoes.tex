@@ -1,0 +1,33 @@
+\section{CONCLUSÕES E TRABALHOS FUTUROS}
+% A conclusão deve conter os principais aspectos e contribuições de forma a finalizar o trabalho apresentado. Deve-se apresentar o que era esperado do trabalho através dos objetivos inseridos inicialmente e mostrar o que foi conseguido. 
+
+% 	Não deve-se inserir um novo assunto na conclusão. Aqui o autor apresentará as próprias impressões sobre o trabalho efetuado. 
+    
+% É importante também que sejam identificadas limitações e problemas que surgiram durante o desenvolvimento do trabalho e quais as consequências do mesmo.
+
+% Os trabalhos futuros devem conter oportunidades de expansão do trabalho apresentado, bem como, novos projetos que puderam ser vislumbrados a partir do desenvolvimento do trabalho
+
+A rede social \textbf{colcom} se mostrou uma solução viável para o fomento da participação direta de indivíduos de uma comunidade em seus processos de decisão, fornecendo tecnologias já bem estabelecidas em favor da deliberação. Ademais, trata-se de uma contribuição nova para o cenário de aplicações que promovem a democracia digital ao fazer uso de conceitos de SCV para gerenciar as propostas dos usuários.
+
+% Entretanto, a aplicação ainda se mostra limitada a um escopo local, dado que ainda faltam formas robustas de mitigar o cadastro e publicação de usuários falsos e mal intencionados.
+% Entretanto, ainda há um espaço aberto para se realizar mais
+
+Entretanto, deve ser salientado que a aplicação, em seu presente estado, ainda é inviável para ser usada em comunidades de grande escala, pois, como visto no capítulo 4, ainda não possui os devidos tratamentos adequados para a verificação dos usuários e das postagens realizadas, sendo assim altamente susceptível à possíveis tentativas de abuso, como: criação de contas falsas, fraude nas votações com uso de tais contas, \textit{spamming}, \textit{trolling}, dentre outras.
+
+Observa-se também a possibilidade da inserção de mais elementos de gameficação, o que potencialmente pode aumentar o engajamento dos usuários. Contudo, devemos observar que tais dinâmicas acabam por inserir pontos de fricção entre os participantes, cabendo um tratamento cuidadoso para se evitar atritos que venham a degradar a experiência participativa \cite{friction}, como, por exemplo, usuários mais experientes na plataforma usando as dinâmicas propostas para minar a participação de outros usuários.
+ 
+Como sugestões de trabalhos futuros, pretende-se:
+\begin{itemize}
+    \item Inserir um balanceador de carga e \textit{proxy} reverso, como o \textit{Nginx};
+    \item Containerizar a aplicação com o \textit{Docker}, para facilitar o \textit{deploy};
+    \item Alterar o formato das mensagens trocadas entre \textit{front-end} e \textit{back-end} de \textit{JSON} para formatos mais eficientes, como os \textit{Protocol Buffers};
+    \item Implementar checagens de dados mais robustas, a fim de reduzir o cadastro de potenciais usuários falsos e mal intencionados;
+    \item Implementar testes unitários e de integração automatizados;
+    \item Inserir \textit{tags} para agrupar conteúdos de mesmo tipo;
+    \item Implementar um buscador por texto;
+    \item Implementar a capacidade de realizar um \textit{merge} entre \textit{posts} diferentes;
+    \item Implementar a capacidade de se ter um post com autoria de múltiplos usuários;
+    \item Implementar um visualizador para ver os tópicos mais promovidos em dias passados;
+    \item Inserir um \textit{leaderboard} dos usuários que mais colaboraram.
+    % \item Inserir algoritmos de aprendizado de máquina 
+\end{itemize}

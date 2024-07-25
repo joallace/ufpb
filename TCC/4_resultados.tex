@@ -1,0 +1,232 @@
+
+\section{APRESENTAÇÃO E ANÁLISE DOS RESULTADOS}
+% Toda pesquisa deve apresentar uma análise sobre a investigação que foi realizada através da metodologia que foi aplicada. Nesta sessão é interessante inserir tabelas, gráficos, imagens que mostrem os resultados, análise de dados coletados, etc.
+
+% É interessante que nessa sessão o autor compare os seus resultados com os resultados de outros trabalhos existentes. Essa comparação aumenta a qualidade do trabalho e demonstra a relevância do mesmo. 
+
+% Nesta sessão o autor pode/deve incluir as contribuições científicas desenvolvidas tais como artigos, patentes, livros e outras contibuições que foram publicadas ou estão em fase de publicação e que são parte do trabalho.
+
+Este capítulo é destinado para a exposição dos resultados, os quais foram obtidos através do plano de testes, detalhado a seguir.
+
+\subsection{Plano de testes}
+O objetivo do plano de testes é permitir a identificação de eventuais problemas de implementação na aplicação, de modo a assegurar o funcionamento esperado da plataforma. Para tal, será realizada uma navegação por todas as principais funcionalidades da aplicação, partindo do cadastro de usuário até a publicação de conteúdos.
+
+% Os testes foram realizados por meio de uma instância hospedada localmente em uma máquina dedicada com Ubuntu Server 22.04 LTS.
+Para efetuar tais testes, tanto a aplicação \textit{front-end} como a \textit{back-end} foram hospedadas localmente em uma máquina dedicada com \textit{Ubuntu Server} 22.04 LTS. A partir desta, o sistema foi acessado de diferentes dispositivos, como \textit{desktops}, \textit{notebooks} e \textit{smartphones}, e usou-se  diferentes navegadores, como \textit{Google Chrome}, \textit{Firefox} e \textit{Safari}, a fim de garantir a disposição correta da aplicação em diferentes combinações de tecnologias.
+
+Infelizmente, os testes foram conduzidos exclusivamente pelo autor do presente trabalho, dado que não foi possível realizar testes com usuários reais antes da data de apresentação do mesmo.
+
+\subsection{Casos de teste}
+A seguir, Nas Tabelas 1-13, serão descritos os casos de teste considerados de maior importância para o fluxo principal de funcionamento da plataforma.
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T01] Cadastrar usuário \\\hline
+    \textbf {Descrição} & Testa-se o cadastro de um usuário não registrado. Refere-se ao [RF01]. \\ \hline
+    \textbf {Passos do teste} & O usuário preenche os campos de nome de usuário, email e senha e clica em “cadastrar". \\ \hline
+    \textbf {Resultado esperado} & O cadastro do usuário deve ser criado no banco de dados, e o usuário dever ser redirecionado para a tela de login. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T01].}
+\end{table}
+
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T02] Logar usuário \\\hline
+    \textbf {Descrição} & Testa-se a realização do \textit{login} de um usuário. Refere-se ao [RF02]. \\ \hline
+    \textbf {Passos do teste} & O usuário preenche os campos de nome de usuário/email e senha e clica em “entrar". \\ \hline
+    \textbf {Resultado esperado} & O usuário deve ser redirecionado para a tela de “promovido" com seus dados carregados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T02].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T03] Criar um tópico\\\hline
+    \textbf {Descrição} & Testa-se a criação de um tópico. Refere-se ao [RF05] \\ \hline
+    \textbf {Passos do teste} & O usuário clica no botão com um “+" na barra de navegação, abrindo um modal, o usuário então preenche os campos de título, marca se deseja que outros usuários possam submeter múltiplos posts e descreve as possíveis respostas, caso já as tenha previamente. \\ \hline
+    \textbf {Resultado esperado}& O tópico é criado no banco de dados e o usuário é redirecionado para a página do tópico. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T03].}
+\end{table}
+
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T04] Avaliar um tópico como relevante \\\hline
+    \textbf {Descrição} & Testa-se os botões de avaliação “relevante" e “não relevante" em um tópico. Refere-se ao [RF03]. \\ \hline
+    \textbf {Passos do teste} & O usuário clica nas setas de avaliação de um tópico, primeiro para definir como “não relevante" e depois para “relevante". \\ \hline
+    \textbf {Resultado esperado}& As setas aparecem preenchidas quando o usuários as clica, gerando um registro de interação correspondente no banco de dados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T04].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T05] Salvar um tópico \\\hline
+    \textbf {Descrição} & Testa-se o botão de salvar de um tópico. Refere-se ao [RF04]. \\ \hline
+    \textbf {Passos do teste} & O usuário clica no botão de salvar de um tópico. \\ \hline
+    \textbf {Resultado esperado}& O ícone do botão se torna preenchido e uma interação de salvamento é criada no banco de dados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T05].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T06] Promover um tópico \\\hline
+    \textbf {Descrição} & Testa-se o botão de promoção de um tópico. Refere-se ao [RF06]. \\ \hline
+    \textbf {Passos do teste} & O usuário clica no botão de promover de um tópico. \\ \hline
+    \textbf {Resultado esperado}& O ícone do botão de promover se torna preenchido e uma interação de promoção vigente até o fim do dia é criada no \textit{back-end}. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T06].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T07] Criar um \textit{post} em resposta a um tópico \\\hline
+    \textbf {Descrição} & Testa-se o fluxo de criação de um \textit{post} em resposta a um tópico. Refere-se aos [RF09] e [RF10]. \\ \hline
+    \textbf {Passos do teste} & O usuário clica no botão de responder de um tópico, e, após ser redirecionado à pagina de escrita, preenche o campo de título e resposta, caso haja opções de resposta, e digita um texto contendo todas as funcionalidades do editor de texto, e então clica no botão “publicar". \\ \hline
+    \textbf {Resultado esperado}& O \textit{post} é criado no \textit{back-end} e o usuário é redirecionado para a página do textit{post}. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T07].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T08] Editar um \textit{post} \\\hline
+    \textbf {Descrição} & Testa-se a edição de um \textit{post}. Refere-se ao [RF12]. \\ \hline
+    \textbf {Passos do teste} & O usuário clica no botão de edição de um tópico, então faz alterações no texto do \textit{post} através do editor de texto, e após de finalizado clica novamente no símbolo de edição, abrindo um modal, por fim o usuário preenche o campo de resumo das alterações e clica no botão “enviar". \\ \hline
+    \textbf {Resultado esperado}& O \textit{slider} de versões registra a nova versão e a edição é enviada para o \textit{back-end}, que cria um novo \textit{commit} no banco de dados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T08].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T09] Criar uma sugestão de edição para um \textit{post} \\\hline
+    \textbf {Descrição} & Testa-se a criação de uma sugestão de edição para um \textit{post}. Refere-se ao [RF13]. \\ \hline
+    \textbf {Passos do teste} & Loga-se em uma conta diferente da usada para a criação do \textit{post} e segue-se o exato mesmo passo a passo do [T08]. \\ \hline
+    \textbf {Resultado esperado}& São criados uma nova interação de sugestão e um \textit{commit} em uma nova \textit{branch} no banco de dados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T09].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T10] Criar um “ramo” de uma versão específica de um \textit{post} \\\hline
+    \textbf {Descrição} & Testa-se a criação de um “ramo” de uma versão específica de um \textit{post}. Refere-se ao [RF14]. \\ \hline
+    \textbf {Passos do teste} & Loga-se em uma conta diferente da usada para a criação do \textit{post} e o usuário clica no botão de clonar do \textit{post}, abrindo um modal, o usuário então preenche o campo “título da cópia" e clica em “clonar".  \\ \hline
+    \textbf {Resultado esperado}& É criado uma nova \textit{branch} pertencente ao usuário no banco de dados, por fim o usuário é redirecionado para a página do \textit{post} criado. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T10].}
+\end{table}
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T11] Acatar sugestão de edição de um \textit{post} \\\hline
+    \textbf {Descrição} & Testa-se o acatamento de uma sugestão de edição em um \textit{post}. Refere-se aos [RF16] e [RF17]. \\ \hline
+    \textbf {Passos do teste} & O usuário autor do \textit{post} clica no botão de incorporar sugestões do \textit{post}, abrindo um modal, então o usuário clica no título de uma das sugestões sendo redirecionado ao \textit{post} com a edição sugerida, então clica no botão de aceitar sugestão. \\ \hline
+    \textbf {Resultado esperado} & É realizado o \textit{merge} da \textit{branch} do autor do \textit{post} e do autor da sugestão no banco de dados, então o usuário é redirecionado para a página do post refletindo as alterações. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T11].}
+\end{table}
+
+\clearpage
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabularx}{0.9\textwidth}{l|X}
+    \hline
+    \textbf {Título} & [T12] Realizar uma crítica em um \textit{post} \\\hline
+    \textbf {Descrição} & Testa-se a realização de uma crítica em um \textit{post}. Refere-se ao [RF19]. \\ \hline
+    \textbf {Passos do teste} & O usuário seleciona um trecho do texto do \textit{post}, e então clica no botão “criticar", abrindo um \textit{frame} de crítica, o usuário então preenche o título e corpo da crítica e clica no botão de confirmar. \\ \hline
+    \textbf {Resultado esperado} & O trecho criticado é sublinhado e é criado um registro da crítica no banco de dados. \\ \hline
+    \textbf {Resultado obtido} & Sucesso. \\ \hline
+    \end{tabularx}
+    \caption{Caso de teste [T12].}
+\end{table}
+
+% \begin{table}[hbt!]
+%     \centering
+%     \begin{tabularx}{0.9\textwidth}{l|X}
+%     \hline
+%     \textbf {Título} & [T13] Cadastrar um usuário inválido \\\hline
+%     \textbf {Descrição} & Testa-se a rejeição do cadastro de usuários inválidos. \\ \hline
+%     \textbf {Passos do teste} & . \\ \hline
+%     \textbf {Resultado esperado} & . \\ \hline
+%     \textbf {Resultado obtido} & Falha. \\ \hline
+%     \end{tabularx}
+%     \caption{Caso de teste [T13].}
+% \end{table}
+
+\subsection{Comparativo com outras plataformas}
+Nesta seção, faremos um comparativo de funcionalidades entre a nossa solução e outras propostas semelhantes, já estabelecidas
+
+%% \subsubsection{Plataformas de democracia digital}
+\subsubsection{\textit{Pol.is}}
+A premissa principal do \textit{Polis} é coletar um grande número de amostras de opiniões de seus usuários e aplicar uma redução de dimensionalidade, através de uma Análise de Componentes Principais (do inglês, \textit{Principal Components Analysis} - PCA), e então aplicar um algoritmo de clusterização, em seu caso um \textit{K-means}, para agrupar os participantes em grupos de opiniões semelhantes, e, então, encontrar pontos comuns entre os diferentes grupos e os pontos que melhor representam cada grupo, visando estimular o diálogo e compreensão mútua entre tais grupos e eventualmente fomentar o consenso.
+
+Nossa plataforma se diferencia ao possibilitar que os participantes criem conjuntamente respostas cada vez mais complexas e completas, ao fazer uso das propriedades evolutivas do SCV. Através de um engajamento contínuo e competição entre as diversas respostas espera-se que os usuários cheguem em um conjunto de respostas que representem melhor cada grupo. Enquanto o \textit{Polis} objetiva ao fim obter várias frases curtas que representem a opinião de seus usuários, nós pretendemos que os usuários criem as respostas mais completas, que representem suas opiniões. Outro ponto de distinção é que nossa plataforma tem um funcionamento satisfatório até em contextos com poucos usuários, bem como com perguntas binárias ou com um viés prévio, cenários os quais o \textit{Polis} pode não perfomar bem \cite{polis}.
+% Nossa plataforma se diferencia ao possibilitar um funcionamento satisfatório até em contextos com poucos usuários, bem como com perguntas binárias ou com um viés prévio, cenários os quais o \textit{Polis} não perfoma bem \cite{polis}.
+
+\subsubsection{\textit{Decidim}}
+O \textit{Decidim}\footnote{Website oficial disponível em: https://decidim.org/. Acesso em 15 de abril de 2024} é uma plataforma modular, que conta com múltiplos espaços para a participação de seus usuários. Cada um desses espaços direciona o esforço dos usuários para objetivos específicos e podem utilizar de diferentes “componentes" que a ferramenta fornece — como enquetes, votações, reuniões, debates, dentre outros —, o que permite que organizações consigam modelar um sistema democrático adaptado a suas necessidades. Inclusive, a plataforma \textit{Brasil Participativo}, citada no capítulo de introdução, trata-se de uma instância adaptada do \textit{Decidim}.
+
+A solução que propomos se distingue ao possibilitar a realização de boa parte das funcionalidades propostas pelo \textit{Decidim} sob uma única estrutura — similar à de um fórum de discussão —, o que pode facilitar o aprendizado do uso da plataforma por novos usuários, diminuindo, assim, a barreira de entrada para a adoção por uma comunidade.
+
+\subsubsection{\textit{Consul}}
+O \textit{Consul}\footnote{Website oficial disponível em: https://consuldemocracy.org/. Acesso em 18 de abril de 2024} é um plataforma modular semelhante ao \textit{Decidim}, mas ao invés de fornecer diferentes espaços, como ocorre no \textit{Decidim}, a plataforma oferta os chamados “processos participativos", os quais são módulos que oferecem as funcionalidades de debates, propostas, votação, legislação colaborativa e orçamento participativo.
+
+Assim como no caso do \textit{Decidim}, nossa plataforma se difere ao ter uma maior simplicidade de design, sem ficar para trás em possibilidades de aplicação.
+
+\subsubsection{\textit{Wikilegis}}
+O \textit{Wikilegis}\footnote{Há diversas instâncias do Wikilegis no ar, mas sua primeira instância foi utilizada pela Câmara dos Deputados do Brasil e está disponível em: https://edemocracia.cl.df.leg.br/wikilegis. Acesso em 15 de abril de 2024} é uma ferramenta digital que permite a realização de trabalho colaborativo na construção da lei, em que os cidadãos podem atuar diretamente sobre projetos de lei e propostas legislativas com indicações de apoio, comentários e sugestões de nova redação a artigos ou parágrafos.
+
+Nossa proposta se difere ao não se limitar ao escopo legislativo, podendo ser usada para uma multitude de aplicações. Além disso, também oferece uma interface mais enxuta para as operações de edição do texto e possibilita uma maior customização dos textos por parte dos usuários, ao permitir que criem cada um sua “ramificação" própria do conteúdo original. 
+
+\subsection{Análise dos resultados}
+Os resultados dos testes, que cobriram o fluxo de uso da aplicação através das funcionalidades chave, apontam que a aplicação está em condições adequadas para uso, dado que foram todos bem sucedidos. Todavia, é necessário notar que os testes descritos aqui não consideram uma enorme gama de possibilidades de casos que usuários maliciosos poderiam utilizar para ganhar vantagens na plataforma, como criação de contas falsas para manipulação das votações e opiniões e outras diversas finalidades, como já ocorre em outras redes sociais \cite{socialMediaBots}.
+
+Por fim, quando comparado à outras soluções, o \textbf{colcom} demonstrou ser uma plataforma com diferenciais significativos e que pode oferecer uma contribuição agregadora  para o processo participativo de diversas comunidades.
+
+% %% \paragraph{Decide Madrid}
+% \subsubsection{Outras plataformas}
+% %% \paragraph{Tabnews}
+% %% \paragraph{Google Docs}
+% \paragraph{\textit{Wikipédia}}
+% \paragraph{\textit{Reddit}}
+% %% \paragraph{Genius}
+% \paragraph{\textit{X}}

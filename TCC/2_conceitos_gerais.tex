@@ -1,0 +1,102 @@
+\section{FUNDAMENTAÇÃO TEÓRICA}
+
+%Lembre-se que as sessões e sub-sessões são determinadas por si para adequar-se ao seu trabalho.
+
+Neste capítulo serão apresentados os principais conceitos de tecnologia utilizadas para construir a aplicação, além de especificar as ferramentas escolhidas.
+
+\subsection{Conceitos Gerais}
+Nesta seção, estão especificados os principais conceitos em que se fundamentam a solução proposta por nós.
+
+\subsubsection{\textit{Front-end}}
+O \textit{front-end} se refere à parte da aplicação que os usuários interagem diretamente, i.e., a interface e seus elementos visuais \cite{backFront}. Atua juntamente com o \textit{back-end}, a partir da realização de requisições de dados para os exibir em sua interface. É normalmente desenvolvido com o uso de: \textit{Hypertext Markup Language} (HTML) para a estruturação, \textit{Cascading Style Sheets} (CSS) para a estilização e \textit{JavaScript} (JS) para a interatividade.
+
+\subsubsection{\textit{Back-end}}
+O \textit{back-end} se refere à parte da aplicação que é responsável por fazer o processamento, armazenamento e fornecimento dos dados, dados estes que são frequentemente gerados pelos usuários e são servidos ao \textit{front-end}, comumente através de mensagens escritas em \textit{JavaScript Object Notation} (JSON). Geralmente é composto por três partes \cite{backFront}: o servidor, que é o \textit{hardware} em si; a aplicação, que lida com as requisições do \textit{front-end}, recebendo, processando e enviando dados; e o banco de dados, que será discutido no próximo tópico.
+
+% O banco de dados trata-se essencialmente de uma coleção de dados, mas também é um termo comumente usado para se referir à associação entre uma coleção de dados e um sistema gerenciador de banco de dados (SGBD) \cite{database}, o qual é responsável por ofertar funcionalidades de criação, leitura, atualização, deleção e manutenção sobre tal coleção. Os bancos de dados podem ser de diferentes tipos, dentre eles, os mais comuns são:
+\subsubsection{Banco de dados}
+O banco de dados trata-se essencialmente da associação entre uma coleção de dados, também chamada de base de dados, e um sistema gerenciador de banco de dados (SGBD) \cite{database}, o qual é responsável por ofertar funcionalidades de manipulação sobre tal coleção, como operações de criação, leitura, atualização, deleção e manutenção. Os bancos de dados podem ser de diferentes tipos, dentre eles, os mais comuns são:
+\begin{itemize}
+    \item \textbf{Bancos de dados relacionais:} Os dados são armazenados em tabelas, as quais podem ser relacionadas umas as outras. A maioria dos SGBD que lidam com bancos de dados relacionais utiliza \textit{Structured Query Language} (SQL) para operar a manipulação dos dados;
+    \item \textbf{Bancos de dados não relacionais:} Os dados são armazenados em qualquer outro formato, e por isto acabam por ser mais flexíveis. Podem ser usados para armazenar imagens, vídeos, documentos e outros tipos de conteúdos.
+\end{itemize}
+
+\subsubsection{Sistema de controle de versões}
+Um sistema de controle de versões (SCV) é um sistema que gerencia o desenvolvimento de um objeto em evolução \cite{scv}. É uma ferramenta muito utilizada no ramo de desenvolvimento de software, pois ele fornece as funcionalidades de rastreamento de alterações em arquivos e a possibilidade de gerenciar diferentes versões de um projeto, além de outros utilitários que facilitam a colaboração entre várias pessoas em um projeto. Nós faremos uso de SCV neste trabalho como um SGBD para um banco de dados local. Há dois conceitos importantes que foram introduzidos por estes sistemas que usaremos em nossa proposta:
+\begin{itemize}
+    \item \textbf{\textit{Branching}:} Consiste em criar uma nova “ramificação" do projeto a partir de uma certa versão, assim permitindo novas versões serem criadas sem causar alterações no “ramo" original, o que facilita o trabalho de várias pessoas em paralelo no mesmo projeto sem causar conflitos;
+    \item \textbf{\textit{Merging}:} É o ato de incorporar as mudanças de um “ramo" em outro, o que facilita que a colaboração entre diferentes pessoas envolvidas no projeto.
+    % e também abre a possibilidade para criar "ramos" temporários para
+\end{itemize}
+
+% \subsubsection{Arquitetura \textit{Model-View-Presenter}}
+% O \textit{Model-View-Presenter} (MVP) é um padrão de arquitetura de software derivado do padrão \textit{Model-View-Controller}. Usualmente, esse padrão é empregado na criação de interfaces de usuário, dividindo-a em três componentes interconectados, visando a divisão clara de responsabilidades entre esses componentes. A Figura \ref{fig:mvp} apresenta a arquitetura MVP.
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[height=9.5cm]{imagens/mvp.png}
+% \caption{Diagrama de funcionamento do padrão MVP.}
+% Fonte: própria do autor
+% \label{fig:mvp}
+% \end{figure}
+
+% As três camadas são a de modelo (\textit{model}), visão (\textit{view}) e apresentação (\textit{presenter}). A camada de modelo é responsável pela lógica de negócio da aplicação e por manipular o banco de dados. A camada de visão trata da visualização dos dados e interação do usuário com o sistema. Já a camada apresentadora atua como intermediária entre as camadas de visão e de modelo, recebendo as ações do usuário enviadas pela camada \textit{view} e realizando as manipulações necessárias sobre a camada \textit{model}, e depois capturando as alterações feitas e devolvendo-as para atualizar a \textit{view}.
+
+
+\subsection{Tecnologias utilizadas}
+Nesta seção, estão especificadas as tecnologias utilizadas para o desenvolvimento de nossa solução, separadas de acordo com a área conceitual em que foi utilizada.
+
+\subsubsection{Gerais}
+\begin{itemize}
+    \item \textbf{\textit{Node.js}}\footnote{Website oficial disponível em: https://nodejs.org/. Acesso em: 1 de abril de 2024}: O \textit{Node} é um ambiente de código aberto para execução de JS. A partir dele, é possível utilizar o JS fora do navegador, o que abre a possibilidade de se desenvolver diversas aplicações. Em nosso caso, o utilizamos para executar tanto o \textit{front-end}, como o \textit{back-end}.
+\end{itemize}
+
+\subsubsection{\textit{Front-end}}
+\begin{itemize}
+    \item \textbf{\textit{JavaScript}}\footnote{Documentação disponível em: https://developer.mozilla.org/en-US/docs/Web/JavaScript. Acesso em 8 de abril de 2024.}: O JS é uma linguagem de programação interpretada de tipagem fraca. Utilizada amplamente no cenário de desenvolvimento Web, principalmente na construção de páginas interativas, também é usada para construir aplicações fora do navegador, como citado no tópico do \textit{Node.js}. Faremos uso do JS para implementar a lógica de funcionamento da interface;
+    \item \textbf{\textit{Vite}}\footnote{Website oficial disponível em: https://vitejs.dev/. Acesso em: 1 de abril de 2024}: É um pacote de ferramentas para desenvolvimento de aplicações \textit{front-end}. O \textit{Vite} inclui comandos para criação de um projeto pré-configurado em vários \textit{frameworks} diferentes, scripts de incialização e para o processo de \textit{build}, suporte à pré-processadores de CSS, além de fornecer a funcionalidade de \textit{Hot Module Replacement}, que possibilita o recarregamento da aplicação à medida que alterações no código são feitas, facilitando o processo de desenvolvimento;
+    \item \textbf{\textit{React}}\footnote{Website oficial disponível em: https://react.dev/. Acesso em: 1 de abril de 2024}: O \textit{React} é uma biblioteca \textit{front-end} para JS de código aberto desenvolvida pela \textit{Meta}, então \textit{Facebook}. Com o \textit{React} é possível construir interfaces de usuário, a partir de partes chamadas “componentes", que podem ser reutilizadas várias vezes pela aplicação, a fim de facilitar a codificação da aplicação. O \textit{React} também introduz uma nova extensão de arquivo, o \textit{JavaScript XML} (JSX), que permite a combinação de HTML e JS em um único arquivo;
+    
+    \item \textbf{\textit{Sass}}\footnote{Website oficial disponível em: https://sass-lang.com/. Acesso em: 1 de abril de 2024}: O \textit{Syntactically Awesome Style Sheets} (Sass) é uma linguagem de extensão e pré-processador do CSS e é de código aberto. O \textit{Sass} estende o CSS ao ofertar alguns mecanismos disponíveis em linguagens de programação convencionais, como variáveis e operadores, e outras ferramentas como o aninhamento. Desta forma, o \textit{Sass} acaba por acelerar o processo de escrita das regras de estilo da aplicação, além de conferir uma melhor legibilidade ao código.
+\end{itemize}
+
+\subsubsection{\textit{Back-end}}
+\begin{itemize}
+    \item \textbf{\textit{TypeScript}}\footnote{Website oficial disponível em: https://typescriptlang.org/. Acesso em: 1 de abril de 2024}: O \textit{TypeScript} é uma linguagem de programação de código aberto desenvolvida pela Microsoft. Esta linguagem é um superconjunto do JS, i.e., adiciona funcionalidades às já existentes do JS. Como indica seu nome, é de tipagem forte, o que possibilita uma maior previsibilidade sobre o funcionamento do código, de modo a facilitar a detecção de possíveis erros;
+    \item \textbf{\textit{Express}}\footnote{Website oficial disponível em: https://expressjs.com/. Acesso em: 1 de abril de 2024}: É um \textit{framework} minimalista para \textit{Node.js} que possibilita a criação de aplicações que gerenciam requisições em servidores. Através do \textit{Express}, é possível criar rotas que ofertam funcionalidades em certos \textit{Uniform Resource Locators} (URLs) para os principais métodos HTTP, sendo alguns deles: GET, para a solicitação de recursos; POST, para submissão de recursos; PATCH, para aplicação de alterações em um recurso; e DELETE, para a deleção de um recurso.
+\end{itemize}
+
+\subsubsection{Banco de dados}
+\begin{itemize}
+    \item \textbf{\textit{PostgreSQL}}\footnote{Website oficial disponível em: https://postgresql.org/. Acesso em: 1 de abril de 2024}: O \textit{PostgreSQL} é um SGBD de código aberto para bancos de dados relacionais. O utilizamos para criar as tabelas que irão armazenar os dados dos usuários, das interações entre os usuários e alguns metadados dos conteúdos gerados;
+    \item \textbf{\textit{Git}}\footnote{Documentação disponível em: https://git-scm.com/. Acesso em 8 de abril de 2024}: Trata-se de um dos SCV mais utilizados no desenvolvimento de software. Teve seu desenvolvimento inciado por Linus Torvalds em 2005 para ser o novo SVC do código fonte do kernel \textit{Linux} \cite{proGit}. Nós faremos uso do \textit{Git} como um SGBD, em que o banco de dados serão documentos que representam os posts. Ao utilizar o \textit{Git} para armazenar os \textit{posts}, conseguimos manter um histórico de alterações de cada \textit{post}, além de nos possibilitar realizar as operações de \textit{branching} e \textit{merging}, para fazer o controle de alterações ente vários usuários em um mesmo \textit{post}.
+    % aproveitando-nos das funcionalidades oferecidas de \textit{branching} e \textit{merging} para fazer o controle de alterações ente vários usuários. 
+\end{itemize}
+
+\subsection{Atores do processo}
+Os únicos atuantes no processo são os próprios membros da comunidade que optarem por participar na plataforma. Nesta plataforma, não há moderadores nem administradores, o conteúdo é gerido totalmente pelos próprios usuários.
+
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[height=6.2cm]{imagens/keep}
+% \caption{Exemplo de como inserir Figura}
+% \label{fig:exemplo}
+% \end{figure}
+
+% \begin{table}[h]
+% \centering
+% \caption{ Modelo de como as tabelas devem ser inseridas no texto }
+% \vspace{0.2in}
+% \newcolumntype{C}{>{\centering\arraybackslash}X}%
+% \newcommand{\rowstyle}[1]{%
+%   \protected\gdef\currentrowstyle{#1}%
+% }
+% \begin{tabularx}{\textwidth}{>{\bf}C|C|C|C}
+% \hline 
+% \textbf {Índice} & \textbf{Coluna 01} &\textbf{ Coluna 02} & \textbf{Coluna 03} \\ \hline
+% Linha 01 & & & \\ \hline
+% Linha 02 & & & \\ \hline                         
+
+% \end{tabularx}
+% \end{table}
