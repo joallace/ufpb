@@ -221,52 +221,6 @@ std::vector<symbol> encode(const std::string &original, arguments &args) {
     return result;
 }
 
-std::string decode(const std::string &compressed, arguments &args) {
-    size_t dictSize = 256;
-    std::unordered_map<size_t, std::string> dictionary;
-    
-    if(args.readDict){
-        dictionary = flipDict(dictFromFile(args.dictPath));
-        dictSize = dictionary.size();
-    }
-    else
-        for (unsigned i = 0; i < 256; i++)
-            dictionary[i] = std::string(1, i);
-
-    size_t currentSymbol =  std::bitset<32>(compressed.substr(0, getMinimumNumberOfBits(dictSize, false))).to_ulong();
-    std::string w(1, currentSymbol); //Decoding the first symbol directly
-    std::string result = w;
-    std::vector<symbol> symbols = {{currentSymbol, 8}};
-    unsigned numberOfBits;
-    std::string entry;
-    
-    for (size_t i = 8; i < compressed.size(); i += numberOfBits) {
-        numberOfBits = getMinimumNumberOfBits(dictSize, false);
-        currentSymbol = std::bitset<32>(compressed.substr(i, numberOfBits)).to_ulong();
-        symbols.push_back({currentSymbol, numberOfBits});
-
-        if (dictionary.count(currentSymbol))
-            entry = dictionary[currentSymbol];
-        else if (currentSymbol == dictSize)
-            entry = w + w[0];
-        else{
-            char errorStr[256];
-            sprintf(errorStr, "Badly compressed symbol \"%ld\" (dictSize = %ld)\n", currentSymbol, dictSize);
-            throw std::runtime_error(errorStr);
-        }
-        
-        result += entry;
-        
-        if(dictionary.size() <= args.maxDictSize)
-            dictionary[dictSize++] = w + entry[0];
-
-        w = entry;
-    }
-
-
-    return result;
-}
-
 
 //------====== Main ======------
 
@@ -275,7 +229,7 @@ arguments argParse(int argc, char** argv){
 
     if (argc < 2) {
         std::cerr << "\nERROR: Missing parameters! Usage:\n"
-                  << " " << argv[0] << " file_path [-c or -d number of n for 2^n bits for the dict] [-o output_path]\n";
+                  << " " << argv[0] << " file_path [-p or -t number of n for 2^n bits for the dict] [-i dict_path] [-e dict_path]\n";
         exit(1);
     }
 
@@ -283,10 +237,7 @@ arguments argParse(int argc, char** argv){
     args.inputPath = argv[1];
 
     for(int i = 2; i < argc; i++){
-        if(!strcmp(argv[i], "-o"))
-            args.outputPath = argv[i+1];
-
-        if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "-d")){
+        if(!strcmp(argv[i], "-t") || !strcmp(argv[i], "-p")){
             size_t dictPow = std::atoi(argv[i+1]);
 
             if(dictPow > 30 || dictPow < 8){
@@ -310,12 +261,6 @@ arguments argParse(int argc, char** argv){
         }
     }
 
-    if(args.outputPath.empty())
-        if(args.operation == 'c')
-            args.outputPath = "encoded.lzw";
-        else
-            args.outputPath = "decoded";
-
     return args;
 }
 
@@ -325,17 +270,15 @@ int main(int argc, char *argv[]) {
     std::vector<char> fileContent = readFile(args.inputPath);
     std::string fileContentStr(fileContent.begin(), fileContent.end());
 
-    if(args.operation == 'c'){
-        printf("Compressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, args.inputPath.c_str());
-        std::vector<symbol> compressed = encode(fileContentStr, args);
-        writeEncodedFile(args.outputPath, compressed);
+    if(args.operation == 't'){
+        printf("Training with a %ldb dict for file at path: %s (%ldb)\n", args.maxDictSize, args.inputPath.c_str(), fileContent.size());
+        encode(fileContentStr, args);
         return 0;
     }
 
-    if(args.operation == 'd'){
-        printf("Decompressing file (%ldb) with a %ldb dict at path: %s\n", fileContent.size(), args.maxDictSize, args.inputPath.c_str());
-        std::string decompressed = decode(toBinaryString(fileContent), args);
-        writeDecodedFile(args.outputPath, decompressed);
+    if(args.operation == 'p'){
+        printf("Predicting genre with a %ldb dict for file at path: %s (%ldb)\n", args.maxDictSize, args.inputPath.c_str(), fileContent.size());
+        encode(fileContentStr, args);
         return 0;
     }   
 }
